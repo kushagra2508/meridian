@@ -9,3 +9,6 @@ npm-debug.log*
 .DS_Store
 .vite/
 coverage/
+.vercel/
+.vercel
+.env*

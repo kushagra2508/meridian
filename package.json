@@ -2,6 +2,7 @@
   "name": "meridian",
   "private": true,
   "version": "0.1.0",
+  "type": "module",
   "description": "Lumina Wealth - AI-first wealth management platform",
   "workspaces": [
     "client",
@@ -16,7 +17,8 @@
     "start": "npm run start --workspace server"
   },
   "devDependencies": {
-    "concurrently": "^9.1.2"
+    "concurrently": "^9.1.2",
+    "vercel": "^58.9.0"
   },
   "engines": {
     "node": ">=20"
