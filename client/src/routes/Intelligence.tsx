@@ -38,8 +38,8 @@ export function Intelligence() {
             <Icon name="auto_awesome" className="text-[24px] text-primary" />
           </h2>
           <p className="mt-2 font-subtitle text-subtitle text-on-surface-variant">
-            Feasibility, Statute and Channel run in sequence. Verdicts land here;
-            the console on the right shows the tools as they fire.
+            Feasibility → Statute → Channel → Reframe → Shared run in sequence.
+            Verdicts land here; the console on the right shows the tools as they fire.
           </p>
         </header>
 

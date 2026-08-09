@@ -1,7 +1,7 @@
 [project]
 name = "meridian-crew"
 version = "0.1.0"
-description = "CrewAI Feasibility, Statute and Channel agents for the Meridian wealth platform"
+description = "CrewAI Meridian desk: Feasibility, Statute, Channel, Reframe and Shared agents"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 dependencies = [

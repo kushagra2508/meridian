@@ -4,6 +4,8 @@ const agentTone: Record<string, string> = {
   Feasibility: 'border-primary/40 bg-primary/5',
   Statute: 'border-secondary/40 bg-secondary/5',
   Channel: 'border-tertiary/40 bg-tertiary/5',
+  Reframe: 'border-primary/30 bg-surface-container-low',
+  Shared: 'border-outline-variant bg-surface-container-high/40',
 }
 
 interface AgentReportsProps {
@@ -23,7 +25,7 @@ export function AgentReports({ reports, running, statusLabel }: AgentReportsProp
           {running ? statusLabel : 'Waiting for the desk'}
         </h3>
         <p className="mt-2 max-w-xl font-body text-body text-on-surface-variant">
-          Feasibility, Statute and Channel write their verdicts here as each stage
+          Feasibility through Shared write their verdicts here as each stage
           finishes. Tool calls stay in the console on the right.
         </p>
       </div>

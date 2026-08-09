@@ -1,6 +1,7 @@
 """CLI for the Meridian agent desk.
 
-Default command runs the full pipeline (Feasibility → Statute → Channel):
+Default command runs the full pipeline
+(Feasibility → Statute → Channel → Reframe → Shared):
 
     uv run meridian \
       --goal "Daughter's undergraduate tuition" \
@@ -8,7 +9,7 @@ Default command runs the full pipeline (Feasibility → Statute → Channel):
       --current-corpus 900000 --monthly-contribution 25000 \
       --allocation equity_large_cap=30,hybrid_aggressive=20,debt_short_duration=30,debt_liquid=20
 
-Single-agent modes: `--agent feasibility|statute|channel`.
+Single-agent modes: `--agent feasibility|statute|channel|reframe|shared`.
 """
 
 from __future__ import annotations
@@ -18,19 +19,33 @@ import json
 import sys
 
 from .agent import FeasibilityVerdict, GoalBrief
-from .channel_agent import ChannelBrief, ChannelVerdict
+from .channel_agent import ChannelVerdict
 from .config import llm_model
 from .crew import (
     MissingCredentialsError,
     default_channel_brief,
+    default_reframe_brief,
+    default_shared_brief,
     default_switch_brief,
     run_channel,
     run_feasibility,
     run_pipeline,
+    run_reframe,
+    run_shared,
     run_statute,
 )
+from .reframe_agent import ReframeVerdict
+from .shared_agent import SharedVerdict
 from .statute_agent import StatuteVerdict, SwitchBrief
-from .stream import emit, stream_channel, stream_feasibility, stream_pipeline, stream_statute
+from .stream import (
+    emit,
+    stream_channel,
+    stream_feasibility,
+    stream_pipeline,
+    stream_reframe,
+    stream_shared,
+    stream_statute,
+)
 from .tools.nav_history import category_keys
 
 DEFAULT_ALLOCATION = (
@@ -41,11 +56,11 @@ DEFAULT_ALLOCATION = (
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="meridian",
-        description="Run Feasibility, Statute and Channel agents.",
+        description="Run the Meridian agent desk (Feasibility through Shared).",
     )
     parser.add_argument(
         "--agent",
-        choices=("pipeline", "feasibility", "statute", "channel"),
+        choices=("pipeline", "feasibility", "statute", "channel", "reframe", "shared"),
         default="pipeline",
         help="Which agent (or the full pipeline) to run. Default: pipeline.",
     )
@@ -191,6 +206,62 @@ def _render_channel(verdict: ChannelVerdict) -> list[str]:
     return lines
 
 
+def _render_reframe(verdict: ReframeVerdict) -> list[str]:
+    lines = [
+        "REFRAME",
+        "",
+        verdict.headline,
+        "",
+        f"  Preferred lever      {verdict.preferred_lever}",
+    ]
+    if verdict.slip_delay_months is not None:
+        lines.append(f"  Slip delay           {verdict.slip_delay_months} months")
+    if verdict.shrink_reachable_target is not None:
+        lines.append(f"  Reachable target     {verdict.shrink_reachable_target:,.0f}")
+    if verdict.topup_additional_monthly is not None:
+        lines.append(f"  Top-up / month       {verdict.topup_additional_monthly:,.0f}")
+    if verdict.levers:
+        lines += ["", "LEVERS:"] + [f"  - {lever.summary}" for lever in verdict.levers]
+    lines += ["", "REASONING:", verdict.reasoning]
+    return lines
+
+
+def _render_shared(verdict: SharedVerdict) -> list[str]:
+    lines = [
+        "SHARED",
+        "",
+        verdict.headline,
+        "",
+        f"  Best path            {verdict.best_path}",
+        f"  Eligible lane        {verdict.highest_eligible_lane}",
+        "",
+        verdict.ranked_recommendation,
+        "",
+        verdict.adviser_blurb,
+    ]
+    if verdict.stances:
+        lines += ["", "STANCES:"] + [
+            f"  - [{s.posture}] {s.path}: {s.line}" for s in verdict.stances
+        ]
+    lines += ["", "REASONING:", verdict.reasoning]
+    return lines
+
+
+def _print_agent_json(run) -> None:
+    print(
+        json.dumps(
+            {
+                "agent": run.agent,
+                "model": run.model,
+                "tools_used": run.tools_used,
+                "verdict": run.verdict.model_dump() if run.verdict else None,
+                "raw": None if run.verdict else run.raw,
+            },
+            indent=2,
+        )
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
@@ -223,8 +294,17 @@ def main(argv: list[str] | None = None) -> int:
             )
             return stream_statute(switch, model=args.model)
         if args.agent == "channel":
-            channel = default_channel_brief(goal, plan=args.channel_plan)
-            return stream_channel(channel, model=args.model)
+            return stream_channel(
+                default_channel_brief(goal, plan=args.channel_plan), model=args.model
+            )
+        if args.agent == "reframe":
+            return stream_reframe(
+                default_reframe_brief(goal, None, None, None), model=args.model
+            )
+        if args.agent == "shared":
+            return stream_shared(
+                default_shared_brief(goal, None, None, None, None), model=args.model
+            )
         return stream_pipeline(
             goal,
             model=args.model,
@@ -258,6 +338,12 @@ def main(argv: list[str] | None = None) -> int:
         if args.agent in {"pipeline", "channel"}:
             print("\n=== Channel brief ===")
             print(default_channel_brief(goal, plan=args.channel_plan).as_prompt_block())
+        if args.agent in {"pipeline", "reframe"}:
+            print("\n=== Reframe brief (pre-upstream preview) ===")
+            print(default_reframe_brief(goal, None, None, None).as_prompt_block())
+        if args.agent in {"pipeline", "shared"}:
+            print("\n=== Shared brief (pre-upstream preview) ===")
+            print(default_shared_brief(goal, None, None, None, None).as_prompt_block())
         print(f"\nModel that would run: {args.model or llm_model()}")
         return 0
 
@@ -267,18 +353,7 @@ def main(argv: list[str] | None = None) -> int:
                 goal, model=args.model, verbose=args.verbose, trace=args.trace
             )
             if args.json:
-                print(
-                    json.dumps(
-                        {
-                            "agent": run.agent,
-                            "model": run.model,
-                            "tools_used": run.tools_used,
-                            "verdict": run.verdict.model_dump() if run.verdict else None,
-                            "raw": None if run.verdict else run.raw,
-                        },
-                        indent=2,
-                    )
-                )
+                _print_agent_json(run)
             else:
                 print()
                 if isinstance(run.verdict, FeasibilityVerdict):
@@ -302,18 +377,7 @@ def main(argv: list[str] | None = None) -> int:
                 switch, model=args.model, verbose=args.verbose, trace=args.trace
             )
             if args.json:
-                print(
-                    json.dumps(
-                        {
-                            "agent": run.agent,
-                            "model": run.model,
-                            "tools_used": run.tools_used,
-                            "verdict": run.verdict.model_dump() if run.verdict else None,
-                            "raw": None if run.verdict else run.raw,
-                        },
-                        indent=2,
-                    )
-                )
+                _print_agent_json(run)
             else:
                 print()
                 if isinstance(run.verdict, StatuteVerdict):
@@ -324,27 +388,54 @@ def main(argv: list[str] | None = None) -> int:
             return 0 if run.verdict else 1
 
         if args.agent == "channel":
-            channel = default_channel_brief(goal, plan=args.channel_plan)
             run = run_channel(
-                channel, model=args.model, verbose=args.verbose, trace=args.trace
+                default_channel_brief(goal, plan=args.channel_plan),
+                model=args.model,
+                verbose=args.verbose,
+                trace=args.trace,
             )
             if args.json:
-                print(
-                    json.dumps(
-                        {
-                            "agent": run.agent,
-                            "model": run.model,
-                            "tools_used": run.tools_used,
-                            "verdict": run.verdict.model_dump() if run.verdict else None,
-                            "raw": None if run.verdict else run.raw,
-                        },
-                        indent=2,
-                    )
-                )
+                _print_agent_json(run)
             else:
                 print()
                 if isinstance(run.verdict, ChannelVerdict):
                     print("\n".join(_render_channel(run.verdict)))
+                else:
+                    print(run.raw)
+                print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
+            return 0 if run.verdict else 1
+
+        if args.agent == "reframe":
+            run = run_reframe(
+                default_reframe_brief(goal, None, None, None),
+                model=args.model,
+                verbose=args.verbose,
+                trace=args.trace,
+            )
+            if args.json:
+                _print_agent_json(run)
+            else:
+                print()
+                if isinstance(run.verdict, ReframeVerdict):
+                    print("\n".join(_render_reframe(run.verdict)))
+                else:
+                    print(run.raw)
+                print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
+            return 0 if run.verdict else 1
+
+        if args.agent == "shared":
+            run = run_shared(
+                default_shared_brief(goal, None, None, None, None),
+                model=args.model,
+                verbose=args.verbose,
+                trace=args.trace,
+            )
+            if args.json:
+                _print_agent_json(run)
+            else:
+                print()
+                if isinstance(run.verdict, SharedVerdict):
+                    print("\n".join(_render_shared(run.verdict)))
                 else:
                     print(run.raw)
                 print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
@@ -391,6 +482,22 @@ def main(argv: list[str] | None = None) -> int:
                     else None
                 ),
             },
+            "reframe": {
+                "tools_used": pipeline.reframe.tools_used if pipeline.reframe else [],
+                "verdict": (
+                    pipeline.reframe.verdict.model_dump()
+                    if pipeline.reframe and pipeline.reframe.verdict
+                    else None
+                ),
+            },
+            "shared": {
+                "tools_used": pipeline.shared.tools_used if pipeline.shared else [],
+                "verdict": (
+                    pipeline.shared.verdict.model_dump()
+                    if pipeline.shared and pipeline.shared.verdict
+                    else None
+                ),
+            },
         }
         print(json.dumps(payload, indent=2))
     else:
@@ -409,6 +516,16 @@ def main(argv: list[str] | None = None) -> int:
             print("\n".join(_render_channel(pipeline.channel.verdict)))
         else:
             print("CHANNEL failed:\n", pipeline.channel.raw if pipeline.channel else "")
+        print("\n" + "=" * 60 + "\n")
+        if pipeline.reframe and isinstance(pipeline.reframe.verdict, ReframeVerdict):
+            print("\n".join(_render_reframe(pipeline.reframe.verdict)))
+        else:
+            print("REFRAME failed:\n", pipeline.reframe.raw if pipeline.reframe else "")
+        print("\n" + "=" * 60 + "\n")
+        if pipeline.shared and isinstance(pipeline.shared.verdict, SharedVerdict):
+            print("\n".join(_render_shared(pipeline.shared.verdict)))
+        else:
+            print("SHARED failed:\n", pipeline.shared.raw if pipeline.shared else "")
         tools = ", ".join(c.name for c in pipeline.tool_calls) or "none"
         print(f"\nTools called: {tools}")
 
