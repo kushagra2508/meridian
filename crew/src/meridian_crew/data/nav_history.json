@@ -1,0 +1,443 @@
+{
+  "schema_version": 1,
+  "source": "https://api.mfapi.in (AMFI daily NAV archive)",
+  "generated_at": "2026-08-09T13:25:04+00:00",
+  "method": {
+    "selection": "name-matched, then confirmed against mfapi's own scheme_category; up to 3 schemes from 3 different fund houses per category",
+    "cagr": "point-to-point on NAV, anniversary matched within 20 days",
+    "volatility_annualised": "stdev of daily log returns over 3y * sqrt(252)",
+    "max_drawdown_5y": "worst peak-to-trough on NAV over 5y",
+    "aggregation": "median across the accepted schemes per category"
+  },
+  "categories": {
+    "commodity_gold": {
+      "label": "Commodity - Gold",
+      "asset_class": "commodity",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.470413,
+      "cagr_3y": 0.347593,
+      "cagr_5y": 0.244555,
+      "volatility_annualised": 0.212402,
+      "max_drawdown_5y": -0.247052,
+      "assumed_forward_return": 0.183416,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the commodity haircut",
+      "notes": "Gold fund-of-funds; AMFI files these under 'Other Scheme - FoF Domestic'.",
+      "schemes": [
+        {
+          "code": 118663,
+          "name": "Nippon India Gold Savings Fund - Direct Plan Growth Plan - Growth Option",
+          "fund_house": "Nippon India Mutual Fund",
+          "scheme_category": "Other Scheme - FoF Domestic"
+        },
+        {
+          "code": 119788,
+          "name": "SBI GOLD FUND- DIRECT PLAN - GROWTH",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Other Scheme - FoF Domestic"
+        },
+        {
+          "code": 120685,
+          "name": "ICICI Prudential Gold ETF FOF - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Other Scheme - FoF Domestic"
+        }
+      ]
+    },
+    "debt_corporate_bond": {
+      "label": "Debt - Corporate Bond",
+      "asset_class": "debt",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.05398,
+      "cagr_3y": 0.075218,
+      "cagr_5y": 0.065456,
+      "volatility_annualised": 0.010716,
+      "max_drawdown_5y": -0.009277,
+      "assumed_forward_return": 0.062183,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the debt haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 118987,
+          "name": "HDFC Corporate Bond Fund - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Debt Scheme - Corporate Bond Fund"
+        },
+        {
+          "code": 120692,
+          "name": "ICICI Prudential Corporate Bond Fund - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Debt Scheme - Corporate Bond Fund"
+        },
+        {
+          "code": 146215,
+          "name": "SBI Corporate Bond Fund - Direct Plan - Growth",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Debt Scheme - Corporate Bond Fund"
+        }
+      ]
+    },
+    "debt_gilt": {
+      "label": "Debt - Gilt",
+      "asset_class": "debt",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.043371,
+      "cagr_3y": 0.070246,
+      "cagr_5y": 0.065353,
+      "volatility_annualised": 0.026512,
+      "max_drawdown_5y": -0.03109,
+      "assumed_forward_return": 0.062085,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the debt haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 119707,
+          "name": "SBI GILT FUND - DIRECT PLAN - GROWTH",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Debt Scheme - Gilt Fund"
+        },
+        {
+          "code": 119116,
+          "name": "HDFC Gilt Fund - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Debt Scheme - Gilt Fund"
+        },
+        {
+          "code": 120590,
+          "name": "ICICI Prudential Gilt Fund - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Debt Scheme - Gilt Fund"
+        }
+      ]
+    },
+    "debt_liquid": {
+      "label": "Debt - Liquid",
+      "asset_class": "debt",
+      "as_of": "2026-08-09",
+      "cagr_1y": 0.064272,
+      "cagr_3y": 0.069571,
+      "cagr_5y": 0.06264,
+      "volatility_annualised": 0.001606,
+      "max_drawdown_5y": -0.000412,
+      "assumed_forward_return": 0.059508,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the debt haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 119800,
+          "name": "SBI Liquid Fund - DIRECT PLAN -Growth",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Debt Scheme - Liquid Fund"
+        },
+        {
+          "code": 120197,
+          "name": "ICICI Prudential Liquid Fund - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Debt Scheme - Liquid Fund"
+        },
+        {
+          "code": 119091,
+          "name": "HDFC Liquid Fund - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Debt Scheme - Liquid Fund"
+        }
+      ]
+    },
+    "debt_short_duration": {
+      "label": "Debt - Short Duration",
+      "asset_class": "debt",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.060145,
+      "cagr_3y": 0.077587,
+      "cagr_5y": 0.067608,
+      "volatility_annualised": 0.009237,
+      "max_drawdown_5y": -0.007834,
+      "assumed_forward_return": 0.064228,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the debt haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 119816,
+          "name": "SBI SHORT TERM DEBT FUND - DIRECT PLAN -GROWTH",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Debt Scheme - Short Duration Fund"
+        },
+        {
+          "code": 119016,
+          "name": "HDFC Short Term Debt Fund - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Debt Scheme - Short Duration Fund"
+        },
+        {
+          "code": 120754,
+          "name": "ICICI Prudential Short Term Fund - Direct Plan - Growth Option",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Debt Scheme - Short Duration Fund"
+        }
+      ]
+    },
+    "equity_elss": {
+      "label": "Equity - ELSS",
+      "asset_class": "equity",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.030077,
+      "cagr_3y": 0.154986,
+      "cagr_5y": 0.164244,
+      "volatility_annualised": 0.125963,
+      "max_drawdown_5y": -0.166679,
+      "assumed_forward_return": 0.131395,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the equity haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 119723,
+          "name": "SBI ELSS Tax Saver FUND - DIRECT PLAN -GROWTH",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Equity Scheme - ELSS"
+        },
+        {
+          "code": 119060,
+          "name": "HDFC ELSS Tax saver - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Equity Scheme - ELSS"
+        },
+        {
+          "code": 120592,
+          "name": "ICICI Prudential ELSS Tax Saver Fund - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Equity Scheme - ELSS"
+        }
+      ]
+    },
+    "equity_flexi_cap": {
+      "label": "Equity - Flexi Cap",
+      "asset_class": "equity",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.04427,
+      "cagr_3y": 0.138734,
+      "cagr_5y": 0.124941,
+      "volatility_annualised": 0.123507,
+      "max_drawdown_5y": -0.166047,
+      "assumed_forward_return": 0.099953,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the equity haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 119718,
+          "name": "SBI Flexicap Fund - DIRECT PLAN - Growth Option",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Equity Scheme - Flexi Cap Fund"
+        },
+        {
+          "code": 118955,
+          "name": "HDFC Flexi Cap Fund - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Equity Scheme - Flexi Cap Fund"
+        },
+        {
+          "code": 120166,
+          "name": "Kotak Flexicap Fund - Growth - Direct",
+          "fund_house": "Kotak Mahindra Mutual Fund",
+          "scheme_category": "Equity Scheme - Flexi Cap Fund"
+        }
+      ]
+    },
+    "equity_large_cap": {
+      "label": "Equity - Large Cap",
+      "asset_class": "equity",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.031885,
+      "cagr_3y": 0.112709,
+      "cagr_5y": 0.129933,
+      "volatility_annualised": 0.125899,
+      "max_drawdown_5y": -0.163646,
+      "assumed_forward_return": 0.103946,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the equity haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 119598,
+          "name": "SBI Large Cap FUND-DIRECT PLAN -GROWTH",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Equity Scheme - Large Cap Fund"
+        },
+        {
+          "code": 119018,
+          "name": "HDFC Large Cap Fund - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Equity Scheme - Large Cap Fund"
+        },
+        {
+          "code": 120586,
+          "name": "ICICI Prudential Large Cap Fund (erstwhile Bluechip Fund) - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Equity Scheme - Large Cap Fund"
+        }
+      ]
+    },
+    "equity_mid_cap": {
+      "label": "Equity - Mid Cap",
+      "asset_class": "equity",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.126182,
+      "cagr_3y": 0.205015,
+      "cagr_5y": 0.185026,
+      "volatility_annualised": 0.150884,
+      "max_drawdown_5y": -0.178842,
+      "assumed_forward_return": 0.148021,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the equity haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 119716,
+          "name": "SBI MIDCAP FUND - DIRECT PLAN - GROWTH",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Equity Scheme - Mid Cap Fund"
+        },
+        {
+          "code": 118989,
+          "name": "HDFC Mid Cap Fund - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Equity Scheme - Mid Cap Fund"
+        },
+        {
+          "code": 120381,
+          "name": "ICICI Prudential MidCap Fund - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Equity Scheme - Mid Cap Fund"
+        }
+      ]
+    },
+    "equity_small_cap": {
+      "label": "Equity - Small Cap",
+      "asset_class": "equity",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.068809,
+      "cagr_3y": 0.133642,
+      "cagr_5y": 0.153043,
+      "volatility_annualised": 0.144366,
+      "max_drawdown_5y": -0.224246,
+      "assumed_forward_return": 0.122434,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the equity haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 120591,
+          "name": "ICICI Prudential Smallcap Fund - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Equity Scheme - Small Cap Fund"
+        },
+        {
+          "code": 125497,
+          "name": "SBI Small Cap Fund - Direct Plan - Growth",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Equity Scheme - Small Cap Fund"
+        },
+        {
+          "code": 130503,
+          "name": "HDFC Small Cap Fund - Growth Option - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Equity Scheme - Small Cap Fund"
+        }
+      ]
+    },
+    "hybrid_aggressive": {
+      "label": "Hybrid - Aggressive",
+      "asset_class": "hybrid",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.066647,
+      "cagr_3y": 0.136101,
+      "cagr_5y": 0.123891,
+      "volatility_annualised": 0.09931,
+      "max_drawdown_5y": -0.126547,
+      "assumed_forward_return": 0.109024,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the hybrid haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 119609,
+          "name": "SBI EQUITY HYBRID FUND - DIRECT PLAN - Growth",
+          "fund_house": "SBI Mutual Fund",
+          "scheme_category": "Hybrid Scheme - Aggressive Hybrid Fund"
+        },
+        {
+          "code": 120251,
+          "name": "ICICI Prudential Equity & Debt Fund - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Hybrid Scheme - Aggressive Hybrid Fund"
+        },
+        {
+          "code": 118794,
+          "name": "Nippon India Aggressive Hybrid Fund - Direct Plan Growth Plan",
+          "fund_house": "Nippon India Mutual Fund",
+          "scheme_category": "Hybrid Scheme - Aggressive Hybrid Fund"
+        }
+      ]
+    },
+    "hybrid_balanced_advantage": {
+      "label": "Hybrid - Balanced Advantage",
+      "asset_class": "hybrid",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.074572,
+      "cagr_3y": 0.129155,
+      "cagr_5y": 0.118775,
+      "volatility_annualised": 0.079195,
+      "max_drawdown_5y": -0.08576,
+      "assumed_forward_return": 0.104522,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the hybrid haircut",
+      "notes": null,
+      "schemes": [
+        {
+          "code": 118968,
+          "name": "HDFC Balanced Advantage Fund - Growth Plan - Direct Plan",
+          "fund_house": "HDFC Mutual Fund",
+          "scheme_category": "Hybrid Scheme - Dynamic Asset Allocation or Balanced Advantage"
+        },
+        {
+          "code": 120377,
+          "name": "ICICI Prudential Balanced Advantage Fund - Direct Plan - Growth",
+          "fund_house": "ICICI Prudential Mutual Fund",
+          "scheme_category": "Hybrid Scheme - Dynamic Asset Allocation or Balanced Advantage"
+        },
+        {
+          "code": 118736,
+          "name": "Nippon India Balanced Advantage Fund - Direct Plan Growth Plan - Growth Option",
+          "fund_house": "Nippon India Mutual Fund",
+          "scheme_category": "Hybrid Scheme - Dynamic Asset Allocation or Balanced Advantage"
+        }
+      ]
+    },
+    "index_nifty50": {
+      "label": "Index - Nifty 50",
+      "asset_class": "equity",
+      "as_of": "2026-08-07",
+      "cagr_1y": 0.009891,
+      "cagr_3y": 0.08904,
+      "cagr_5y": 0.096272,
+      "volatility_annualised": 0.132109,
+      "max_drawdown_5y": -0.165693,
+      "assumed_forward_return": 0.077018,
+      "forward_return_basis": "median trailing 5y CAGR of 3 scheme(s), less the equity haircut",
+      "notes": "Nifty 50 only; Next 50, Nifty 500 and factor variants are excluded.",
+      "schemes": [
+        {
+          "code": 118741,
+          "name": "Nippon India Index Fund - Nifty 50 Plan - Direct Plan Growth Plan - Growth Option",
+          "fund_house": "Nippon India Mutual Fund",
+          "scheme_category": "Other Scheme - Index Funds"
+        },
+        {
+          "code": 119648,
+          "name": "Aditya Birla Sun Life Nifty 50 Index Fund - Growth - Direct Plan",
+          "fund_house": "Aditya Birla Sun Life Mutual Fund",
+          "scheme_category": "Other Scheme - Index Funds"
+        },
+        {
+          "code": 148978,
+          "name": "Kotak Nifty 50 Index Fund - Direct Plan-Growth",
+          "fund_house": "Kotak Mahindra Mutual Fund",
+          "scheme_category": "Other Scheme - Index Funds"
+        }
+      ]
+    }
+  }
+}

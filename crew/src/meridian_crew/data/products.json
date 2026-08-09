@@ -1,0 +1,273 @@
+{
+  "schema_version": 1,
+  "notes": [
+    "lockup_years is the hard, contractual period during which capital cannot be withdrawn at all.",
+    "exit_load_months is a soft cost window: withdrawal is permitted but a fee applies.",
+    "min_recommended_years is a suitability floor driven by the product's volatility, not a contractual term.",
+    "age_locked products unlock at an age rather than after a fixed number of years."
+  ],
+  "products": [
+    {
+      "id": "mf_equity_large_cap",
+      "name": "Open-ended Large Cap Equity Fund",
+      "kind": "mutual_fund",
+      "category": "equity_large_cap",
+      "lockup_years": 0.0,
+      "exit_load_months": 12,
+      "min_recommended_years": 5.0,
+      "basis": "SEBI open-ended scheme; redeemable on any business day."
+    },
+    {
+      "id": "mf_equity_flexi_cap",
+      "name": "Open-ended Flexi Cap Equity Fund",
+      "kind": "mutual_fund",
+      "category": "equity_flexi_cap",
+      "lockup_years": 0.0,
+      "exit_load_months": 12,
+      "min_recommended_years": 5.0,
+      "basis": "SEBI open-ended scheme; redeemable on any business day."
+    },
+    {
+      "id": "mf_equity_mid_cap",
+      "name": "Open-ended Mid Cap Equity Fund",
+      "kind": "mutual_fund",
+      "category": "equity_mid_cap",
+      "lockup_years": 0.0,
+      "exit_load_months": 12,
+      "min_recommended_years": 7.0,
+      "basis": "SEBI open-ended scheme; drawdown profile needs a long runway."
+    },
+    {
+      "id": "mf_equity_small_cap",
+      "name": "Open-ended Small Cap Equity Fund",
+      "kind": "mutual_fund",
+      "category": "equity_small_cap",
+      "lockup_years": 0.0,
+      "exit_load_months": 12,
+      "min_recommended_years": 8.0,
+      "basis": "SEBI open-ended scheme; deepest drawdowns of the equity set."
+    },
+    {
+      "id": "mf_index_nifty50",
+      "name": "Nifty 50 Index Fund",
+      "kind": "mutual_fund",
+      "category": "index_nifty50",
+      "lockup_years": 0.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 5.0,
+      "basis": "Passive open-ended scheme, typically no exit load."
+    },
+    {
+      "id": "mf_elss",
+      "name": "ELSS (Equity Linked Savings Scheme)",
+      "kind": "mutual_fund",
+      "category": "equity_elss",
+      "lockup_years": 3.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 5.0,
+      "basis": "Statutory 3-year lock-in per instalment under Section 80C."
+    },
+    {
+      "id": "mf_hybrid_aggressive",
+      "name": "Aggressive Hybrid Fund",
+      "kind": "mutual_fund",
+      "category": "hybrid_aggressive",
+      "lockup_years": 0.0,
+      "exit_load_months": 12,
+      "min_recommended_years": 4.0,
+      "basis": "SEBI open-ended scheme, 65-80% equity."
+    },
+    {
+      "id": "mf_hybrid_baf",
+      "name": "Balanced Advantage Fund",
+      "kind": "mutual_fund",
+      "category": "hybrid_balanced_advantage",
+      "lockup_years": 0.0,
+      "exit_load_months": 12,
+      "min_recommended_years": 3.0,
+      "basis": "Dynamic equity allocation dampens the drawdown."
+    },
+    {
+      "id": "mf_debt_corporate_bond",
+      "name": "Corporate Bond Fund",
+      "kind": "mutual_fund",
+      "category": "debt_corporate_bond",
+      "lockup_years": 0.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 3.0,
+      "basis": "Open-ended debt scheme, predominantly AA+ and above."
+    },
+    {
+      "id": "mf_debt_short_duration",
+      "name": "Short Duration Debt Fund",
+      "kind": "mutual_fund",
+      "category": "debt_short_duration",
+      "lockup_years": 0.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 1.5,
+      "basis": "Macaulay duration 1-3 years."
+    },
+    {
+      "id": "mf_debt_gilt",
+      "name": "Gilt Fund",
+      "kind": "mutual_fund",
+      "category": "debt_gilt",
+      "lockup_years": 0.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 4.0,
+      "basis": "No credit risk but material duration risk."
+    },
+    {
+      "id": "mf_debt_liquid",
+      "name": "Liquid Fund",
+      "kind": "mutual_fund",
+      "category": "debt_liquid",
+      "lockup_years": 0.0,
+      "exit_load_months": 0.25,
+      "min_recommended_years": 0.1,
+      "basis": "Graded exit load for redemptions within 7 days."
+    },
+    {
+      "id": "mf_arbitrage",
+      "name": "Arbitrage Fund",
+      "kind": "mutual_fund",
+      "category": "debt_liquid",
+      "lockup_years": 0.0,
+      "exit_load_months": 1,
+      "min_recommended_years": 0.5,
+      "basis": "Cash-futures arbitrage with equity taxation."
+    },
+    {
+      "id": "mf_gold",
+      "name": "Gold ETF / Gold Fund of Funds",
+      "kind": "mutual_fund",
+      "category": "commodity_gold",
+      "lockup_years": 0.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 5.0,
+      "basis": "Exchange traded or open-ended FoF."
+    },
+    {
+      "id": "fmp_3y",
+      "name": "Fixed Maturity Plan (3-year)",
+      "kind": "mutual_fund",
+      "category": "debt_corporate_bond",
+      "lockup_years": 3.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 3.0,
+      "basis": "Close-ended; listed but effectively illiquid until maturity."
+    },
+    {
+      "id": "ppf",
+      "name": "Public Provident Fund",
+      "kind": "small_savings",
+      "category": null,
+      "lockup_years": 15.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 15.0,
+      "basis": "15-year maturity; partial withdrawal only from year 7."
+    },
+    {
+      "id": "nsc",
+      "name": "National Savings Certificate (VIII Issue)",
+      "kind": "small_savings",
+      "category": null,
+      "lockup_years": 5.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 5.0,
+      "basis": "5-year statutory term."
+    },
+    {
+      "id": "scss",
+      "name": "Senior Citizens' Savings Scheme",
+      "kind": "small_savings",
+      "category": null,
+      "lockup_years": 5.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 5.0,
+      "basis": "5-year term; premature closure carries a penalty. Age 60+ only."
+    },
+    {
+      "id": "ssy",
+      "name": "Sukanya Samriddhi Yojana",
+      "kind": "small_savings",
+      "category": null,
+      "lockup_years": 21.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 21.0,
+      "basis": "Matures 21 years from opening; partial withdrawal at girl's age 18."
+    },
+    {
+      "id": "tax_saver_fd",
+      "name": "5-year Tax Saving Fixed Deposit",
+      "kind": "deposit",
+      "category": null,
+      "lockup_years": 5.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 5.0,
+      "basis": "No premature withdrawal permitted under Section 80C."
+    },
+    {
+      "id": "bank_fd",
+      "name": "Bank Fixed Deposit (non-tax-saving)",
+      "kind": "deposit",
+      "category": null,
+      "lockup_years": 0.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 0.25,
+      "basis": "Breakable with a 0.5-1.0% rate penalty."
+    },
+    {
+      "id": "sgb",
+      "name": "Sovereign Gold Bond",
+      "kind": "bond",
+      "category": "commodity_gold",
+      "lockup_years": 5.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 8.0,
+      "basis": "8-year maturity; RBI buyback from year 5. Exchange liquidity is thin."
+    },
+    {
+      "id": "ulip",
+      "name": "Unit Linked Insurance Plan",
+      "kind": "insurance",
+      "category": "hybrid_aggressive",
+      "lockup_years": 5.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 10.0,
+      "basis": "IRDAI-mandated 5-year lock-in; front-loaded charges."
+    },
+    {
+      "id": "nps_tier1",
+      "name": "NPS Tier I",
+      "kind": "retirement",
+      "category": "hybrid_aggressive",
+      "lockup_years": null,
+      "unlock_age": 60,
+      "exit_load_months": 0,
+      "min_recommended_years": 10.0,
+      "basis": "Locked until age 60; 40% must be annuitised at exit."
+    },
+    {
+      "id": "nps_tier2",
+      "name": "NPS Tier II",
+      "kind": "retirement",
+      "category": "hybrid_aggressive",
+      "lockup_years": 0.0,
+      "exit_load_months": 0,
+      "min_recommended_years": 3.0,
+      "basis": "Withdrawable at will for non-government subscribers."
+    },
+    {
+      "id": "epf_vpf",
+      "name": "EPF / Voluntary Provident Fund",
+      "kind": "retirement",
+      "category": null,
+      "lockup_years": null,
+      "unlock_age": 58,
+      "exit_load_months": 0,
+      "min_recommended_years": 10.0,
+      "basis": "Locked until 58 apart from specified partial-withdrawal grounds."
+    }
+  ]
+}
