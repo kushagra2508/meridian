@@ -81,9 +81,3 @@ export type AgentEvent =
   | { type: 'message'; id: string; at: string; source: string; text: string }
   | { type: 'status'; id: string; state: 'thinking' | 'idle' | 'halted'; label: string }
   | { type: 'done'; id: string; at: string; summary: string }
-
-export interface AgentRunHandle {
-  runId: string
-  prompt: string
-  agentName: string
-}

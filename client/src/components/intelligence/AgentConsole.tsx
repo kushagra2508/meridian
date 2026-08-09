@@ -19,7 +19,7 @@ export function AgentConsole() {
     const prompt = draft.trim()
     if (!prompt || running) return
     setDraft('')
-    void start(prompt)
+    start(prompt)
   }
 
   return (
@@ -46,7 +46,7 @@ export function AgentConsole() {
 
         <button
           type="button"
-          onClick={() => void halt()}
+          onClick={halt}
           disabled={!running}
           title="Halt agent"
           aria-label="Halt agent"

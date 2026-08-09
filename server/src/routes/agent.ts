@@ -1,6 +1,5 @@
 import { Router } from 'express'
 import { resolveAgentProvider } from '../agents/index.js'
-import { createRun, dropRun, getRun, stopRun } from '../agents/runRegistry.js'
 
 const provider = resolveAgentProvider()
 
@@ -10,39 +9,18 @@ agentRouter.get('/provider', (_req, res) => {
   res.json({ provider: provider.name, agentName: provider.agentName })
 })
 
-agentRouter.post('/runs', (req, res) => {
+/**
+ * A run is created and streamed within a single request so that nothing has to
+ * be remembered between requests. That keeps the endpoint correct when each
+ * request may land on a different serverless instance, and it lets the client
+ * halt a run simply by closing the stream.
+ */
+agentRouter.get('/stream', async (req, res) => {
+  const requested = req.query.prompt
   const prompt =
-    typeof req.body?.prompt === 'string' && req.body.prompt.trim().length > 0
-      ? req.body.prompt.trim()
+    typeof requested === 'string' && requested.trim().length > 0
+      ? requested.trim()
       : 'Review portfolio exposure and surface actionable alpha.'
-
-  const run = createRun(provider, prompt)
-  res.status(201).json({ runId: run.id, prompt: run.prompt, agentName: provider.agentName })
-})
-
-agentRouter.post('/runs/:runId/stop', (req, res) => {
-  const stopped = stopRun(req.params.runId)
-  if (!stopped) {
-    res.status(404).json({ error: 'run_not_found' })
-    return
-  }
-  res.json({ ok: true })
-})
-
-agentRouter.get('/runs/:runId/stream', async (req, res) => {
-  const run = getRun(req.params.runId)
-
-  if (!run) {
-    res.status(404).json({ error: 'run_not_found' })
-    return
-  }
-
-  if (run.consumed) {
-    res.status(409).json({ error: 'run_already_streamed' })
-    return
-  }
-
-  run.consumed = true
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -50,14 +28,15 @@ agentRouter.get('/runs/:runId/stream', async (req, res) => {
     Connection: 'keep-alive',
     'X-Accel-Buffering': 'no',
   })
-  res.write(`retry: 5000\n\n`)
+  res.write('retry: 5000\n\n')
   res.flushHeaders?.()
 
+  const controller = new AbortController()
   const heartbeat = setInterval(() => res.write(': ping\n\n'), 15000)
-  req.on('close', () => run.controller.abort())
+  req.on('close', () => controller.abort())
 
   try {
-    for await (const event of run.stream) {
+    for await (const event of provider.startRun({ prompt, signal: controller.signal })) {
       res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`)
     }
   } catch (error) {
@@ -65,7 +44,6 @@ agentRouter.get('/runs/:runId/stream', async (req, res) => {
     res.write(`event: error\ndata: ${JSON.stringify({ message })}\n\n`)
   } finally {
     clearInterval(heartbeat)
-    dropRun(run.id)
     res.end()
   }
 })

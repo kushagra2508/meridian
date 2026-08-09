@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { startAgentRun, stopAgentRun, subscribeToAgentRun } from '../lib/api'
+import { subscribeToAgentRun } from '../lib/api'
 import type { AgentEvent } from '../lib/types'
 
 export type ConsoleItem =
@@ -82,18 +82,16 @@ export function useAgentRun(initialPrompt: string) {
   const [error, setError] = useState<string | null>(null)
 
   const closeRef = useRef<(() => void) | null>(null)
-  const runIdRef = useRef<string | null>(null)
   const generationRef = useRef(0)
 
   const teardown = useCallback(() => {
     generationRef.current += 1
     closeRef.current?.()
     closeRef.current = null
-    runIdRef.current = null
   }, [])
 
   const start = useCallback(
-    async (prompt: string) => {
+    (prompt: string) => {
       teardown()
       const generation = generationRef.current
 
@@ -102,51 +100,38 @@ export function useAgentRun(initialPrompt: string) {
       setRunning(true)
       setStatus({ state: 'thinking', label: 'Connecting to engine' })
 
-      try {
-        const handle = await startAgentRun(prompt)
-        if (generation !== generationRef.current) return
-
-        runIdRef.current = handle.runId
-        closeRef.current = subscribeToAgentRun(handle.runId, {
-          onEvent: (event) => {
-            if (generation !== generationRef.current) return
-            if (event.type === 'status') {
-              setStatus({ state: event.state, label: event.label })
-              return
-            }
-            setItems((current) => reduceEvent(current, event))
-          },
-          onError: (streamError) => {
-            if (generation !== generationRef.current) return
-            setError(streamError.message)
-          },
-          onClose: () => {
-            if (generation !== generationRef.current) return
-            setRunning(false)
-          },
-        })
-      } catch {
-        if (generation !== generationRef.current) return
-        setRunning(false)
-        setStatus(IDLE_STATUS)
-        setError('Could not reach the agent service. Is the API running?')
-      }
+      closeRef.current = subscribeToAgentRun(prompt, {
+        onEvent: (event) => {
+          if (generation !== generationRef.current) return
+          if (event.type === 'status') {
+            setStatus({ state: event.state, label: event.label })
+            return
+          }
+          setItems((current) => reduceEvent(current, event))
+        },
+        onError: (streamError) => {
+          if (generation !== generationRef.current) return
+          setError(streamError.message)
+        },
+        onClose: () => {
+          if (generation !== generationRef.current) return
+          setRunning(false)
+        },
+      })
     },
     [teardown],
   )
 
-  const halt = useCallback(async () => {
-    const runId = runIdRef.current
+  // Closing the stream is what halts the run: the server aborts the provider
+  // when the request ends.
+  const halt = useCallback(() => {
     teardown()
     setRunning(false)
     setStatus({ state: 'halted', label: 'Halted by operator' })
-    if (runId) {
-      await stopAgentRun(runId).catch(() => undefined)
-    }
   }, [teardown])
 
   useEffect(() => {
-    void start(initialPrompt)
+    start(initialPrompt)
     return teardown
     // Kicks off exactly one run when the console mounts.
     // eslint-disable-next-line react-hooks/exhaustive-deps

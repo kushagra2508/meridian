@@ -1,6 +1,5 @@
 import type {
   AgentEvent,
-  AgentRunHandle,
   IntelligenceReports,
   PortfolioSeries,
   PortfolioSummary,
@@ -34,17 +33,6 @@ export function getIntelligenceReports(signal?: AbortSignal) {
   return request<IntelligenceReports>('/intelligence/reports', { signal })
 }
 
-export function startAgentRun(prompt: string) {
-  return request<AgentRunHandle>('/agent/runs', {
-    method: 'POST',
-    body: JSON.stringify({ prompt }),
-  })
-}
-
-export function stopAgentRun(runId: string) {
-  return request<{ ok: boolean }>(`/agent/runs/${runId}/stop`, { method: 'POST' })
-}
-
 const AGENT_EVENT_TYPES = [
   'log',
   'tool_call',
@@ -62,14 +50,15 @@ export interface AgentStreamHandlers {
 }
 
 /**
- * Subscribes to a run's SSE stream. EventSource retries on its own, so the
- * source is closed explicitly once the run reports `done`.
+ * Opens an agent run as a single SSE request and returns a function that halts
+ * it: closing the stream aborts the run server-side. EventSource reconnects on
+ * its own, so the source is also closed explicitly once the run reports `done`.
  */
 export function subscribeToAgentRun(
-  runId: string,
+  prompt: string,
   { onEvent, onError, onClose }: AgentStreamHandlers,
 ): () => void {
-  const source = new EventSource(`${API_BASE}/agent/runs/${runId}/stream`)
+  const source = new EventSource(`${API_BASE}/agent/stream?prompt=${encodeURIComponent(prompt)}`)
   let closed = false
 
   const close = () => {

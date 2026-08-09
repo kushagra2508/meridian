@@ -57,9 +57,12 @@ server/
 | GET    | `/api/portfolio/summary`          | Balance, YTD delta, health score, allocations    |
 | GET    | `/api/portfolio/series?range=1M`  | Time series for `1D`, `1W`, `1M`, `1Y`           |
 | GET    | `/api/intelligence/reports`       | Alpha report, risk parity, regional sentiment    |
-| POST   | `/api/agent/runs`                 | Starts an agent run, returns `{ runId }`         |
-| GET    | `/api/agent/runs/:runId/stream`   | Server-Sent Events stream of agent events        |
-| POST   | `/api/agent/runs/:runId/stop`     | Halts an in-flight run                           |
+| GET    | `/api/agent/provider`             | Active provider and agent name                   |
+| GET    | `/api/agent/stream?prompt=...`    | Runs an agent and streams events over SSE        |
+
+A run starts and streams inside one request, so nothing is held between
+requests and the endpoint stays correct when each request lands on a different
+serverless instance. Closing the stream halts the run.
 
 ## Agent engine
 
