@@ -2,6 +2,7 @@ import cors from 'cors'
 import express from 'express'
 import { agentRouter } from './routes/agent.js'
 import { intelligenceRouter } from './routes/intelligence.js'
+import { personaRouter } from './routes/personas.js'
 import { portfolioRouter } from './routes/portfolio.js'
 
 export function createApp() {
@@ -14,6 +15,7 @@ export function createApp() {
     res.json({ status: 'ok', uptime: process.uptime() })
   })
 
+  app.use('/api/personas', personaRouter)
   app.use('/api/portfolio', portfolioRouter)
   app.use('/api/intelligence', intelligenceRouter)
   app.use('/api/agent', agentRouter)

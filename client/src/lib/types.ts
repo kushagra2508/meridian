@@ -28,6 +28,41 @@ export interface PortfolioSummary {
   watchlist: Holding[]
 }
 
+export interface PersonaProfile {
+  age: number
+  salary: number
+  equityAllocationPct: number
+  depositAllocationPct: number
+}
+
+export type PersonaTraitKey = keyof PersonaProfile
+
+export interface PersonaTrait {
+  key: PersonaTraitKey
+  label: string
+  min: number
+  max: number
+  step: number
+  unit: 'years' | 'currency' | 'percent'
+}
+
+export interface Persona {
+  id: string
+  name: string
+  exhibit: string
+  incomeBand: string
+  selfDirectedPct: number
+  primaryChannel: string
+  thesis: string
+  profile: PersonaProfile
+}
+
+export interface PersonaCatalog {
+  personas: Persona[]
+  traits: PersonaTrait[]
+  defaultPersonaId: string
+}
+
 export interface SeriesPoint {
   t: string
   label: string

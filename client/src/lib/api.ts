@@ -1,6 +1,7 @@
 import type {
   AgentEvent,
   IntelligenceReports,
+  PersonaCatalog,
   PortfolioSeries,
   PortfolioSummary,
   SeriesRange,
@@ -19,6 +20,10 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   return (await response.json()) as T
+}
+
+export function getPersonaCatalog(signal?: AbortSignal) {
+  return request<PersonaCatalog>('/personas', { signal })
 }
 
 export function getPortfolioSummary(signal?: AbortSignal) {

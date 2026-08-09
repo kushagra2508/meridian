@@ -1,14 +1,21 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Icon } from '../components/Icon'
 import { BalanceChart } from '../components/dashboard/BalanceChart'
 import { HealthGauge } from '../components/dashboard/HealthGauge'
+import { PersonaSelector } from '../components/dashboard/PersonaSelector'
 import { useAsyncData } from '../hooks/useAsyncData'
 import { getPortfolioSeries, getPortfolioSummary } from '../lib/api'
 import { formatCurrency, formatSignedPct } from '../lib/format'
-import { SERIES_RANGES, type SeriesRange } from '../lib/types'
+import { SERIES_RANGES, type Persona, type SeriesRange } from '../lib/types'
 
 export function Dashboard() {
   const [range, setRange] = useState<SeriesRange>('1M')
+  const [persona, setPersona] = useState<Persona | null>(null)
+  const positionRef = useRef<HTMLDivElement>(null)
+
+  const scrollToPosition = useCallback(() => {
+    positionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [])
 
   const summaryState = useAsyncData(
     useCallback((signal: AbortSignal) => getPortfolioSummary(signal), []),
@@ -31,8 +38,19 @@ export function Dashboard() {
         </div>
       ) : null}
 
-      <div className="mb-stack-lg flex flex-col items-start justify-between gap-4 md:flex-row md:items-end">
+      <PersonaSelector onPersonaChange={setPersona} onContinue={scrollToPosition} />
+
+      <div
+        ref={positionRef}
+        className="mb-stack-lg flex scroll-mt-24 flex-col items-start justify-between gap-4 md:flex-row md:items-end"
+      >
         <div>
+          {persona ? (
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container px-3 py-1 font-table-header text-table-header uppercase tracking-[0.1em] text-on-surface-variant">
+              <Icon name="person" className="text-[14px] text-primary" />
+              Planning for {persona.id} · {persona.name}
+            </div>
+          ) : null}
           <h2 className="max-w-3xl font-page-title text-page-title tracking-tight text-on-surface">
             {summary?.headline ?? 'Loading your portfolio position...'}
           </h2>
