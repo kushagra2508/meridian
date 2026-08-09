@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url'
 import type { AgentEvent } from '../types.js'
 import type { AgentProvider, AgentRunInput } from './provider.js'
 
-const AGENT_NAME = 'Feasibility'
+const AGENT_NAME = 'Meridian desk'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 // src/agents at dev time, dist/agents after a build; the package sits beside both.
@@ -59,6 +59,14 @@ interface StreamEvent {
   status?: 'ok' | 'error'
   summary?: string
   text?: string
+  report?: {
+    agent: string
+    title: string
+    headline: string
+    verdict?: string
+    metrics?: { label: string; value: string }[]
+    bullets?: string[]
+  }
 }
 
 function clockLabel(date = new Date()): string {
@@ -127,6 +135,7 @@ function toAgentEvent(event: StreamEvent): AgentEvent | null {
         at: clockLabel(),
         source: event.source ?? AGENT_NAME,
         text: event.text ?? '',
+        ...(event.report ? { report: event.report } : {}),
       }
     case 'done':
       return { type: 'done', id, at: clockLabel(), summary: event.summary ?? '' }

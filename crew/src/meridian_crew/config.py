@@ -13,6 +13,8 @@ DATA_DIR = PACKAGE_ROOT / "data"
 
 NAV_HISTORY_PATH = DATA_DIR / "nav_history.json"
 PRODUCTS_PATH = DATA_DIR / "products.json"
+TAX_RULES_PATH = DATA_DIR / "tax_rules.json"
+EXPENSE_RATIOS_PATH = DATA_DIR / "expense_ratios.json"
 
 load_dotenv(PROJECT_ROOT / ".env")
 
@@ -31,6 +33,12 @@ FORWARD_RETURN_HAIRCUT = {
 
 # Applied when a category carries an asset class we have no haircut for.
 DEFAULT_HAIRCUT = 0.15
+
+# Pricing a switch needs a cost basis, and a goal brief rarely carries one. When
+# the adviser has not supplied per-holding figures, these stand in and are
+# printed in the brief so the agent quotes an assumption rather than a fact.
+DEFAULT_EMBEDDED_GAIN_PCT = 25.0
+DEFAULT_HOLDING_MONTHS = 36.0
 
 
 def llm_model() -> str:

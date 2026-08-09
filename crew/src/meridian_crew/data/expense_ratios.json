@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "source": "AMFI Total Expense Ratio of Mutual Fund Schemes (category medians from representative open-ended Growth plans)",
+  "generated_at": "2026-08-09T14:00:00+00:00",
+  "unit": "decimal_annual",
+  "notes": [
+    "Figures are annual Total Expense Ratios as decimals (0.018 means 1.8% a year).",
+    "Each category pairs a Direct plan TER with the Regular plan TER of the same scheme family.",
+    "The gap is the distribution trail embedded in the Regular plan; Direct and Regular hold the same portfolio.",
+    "This is a committed snapshot so tools stay offline and deterministic. Re-check against AMFI TER disclosures after major SEBI fee changes."
+  ],
+  "categories": {
+    "equity_large_cap": {
+      "label": "Equity - Large Cap",
+      "direct_ter": 0.0072,
+      "regular_ter": 0.0185,
+      "representative_schemes": [
+        "HDFC Top 100 Fund",
+        "ICICI Prudential Bluechip Fund",
+        "SBI Blue Chip Fund"
+      ]
+    },
+    "equity_flexi_cap": {
+      "label": "Equity - Flexi Cap",
+      "direct_ter": 0.0078,
+      "regular_ter": 0.0195,
+      "representative_schemes": [
+        "Parag Parikh Flexi Cap Fund",
+        "HDFC Flexi Cap Fund",
+        "Kotak Flexicap Fund"
+      ]
+    },
+    "equity_mid_cap": {
+      "label": "Equity - Mid Cap",
+      "direct_ter": 0.0084,
+      "regular_ter": 0.0205,
+      "representative_schemes": [
+        "HDFC Mid-Cap Opportunities Fund",
+        "Kotak Emerging Equity Fund",
+        "Nippon India Growth Fund"
+      ]
+    },
+    "equity_small_cap": {
+      "label": "Equity - Small Cap",
+      "direct_ter": 0.009,
+      "regular_ter": 0.0215,
+      "representative_schemes": [
+        "Nippon India Small Cap Fund",
+        "SBI Small Cap Fund",
+        "HDFC Small Cap Fund"
+      ]
+    },
+    "equity_elss": {
+      "label": "Equity - ELSS",
+      "direct_ter": 0.0076,
+      "regular_ter": 0.0198,
+      "representative_schemes": [
+        "Axis Long Term Equity Fund",
+        "Mirae Asset Tax Saver Fund",
+        "DSP Tax Saver Fund"
+      ]
+    },
+    "index_nifty50": {
+      "label": "Index - Nifty 50",
+      "direct_ter": 0.0015,
+      "regular_ter": 0.0055,
+      "representative_schemes": [
+        "UTI Nifty 50 Index Fund",
+        "HDFC Index Fund Nifty 50",
+        "ICICI Prudential Nifty 50 Index Fund"
+      ]
+    },
+    "hybrid_aggressive": {
+      "label": "Hybrid - Aggressive",
+      "direct_ter": 0.0088,
+      "regular_ter": 0.0202,
+      "representative_schemes": [
+        "Canara Robeco Equity Hybrid Fund",
+        "SBI Equity Hybrid Fund",
+        "ICICI Prudential Equity & Debt Fund"
+      ]
+    },
+    "hybrid_balanced_advantage": {
+      "label": "Hybrid - Balanced Advantage",
+      "direct_ter": 0.007,
+      "regular_ter": 0.0182,
+      "representative_schemes": [
+        "ICICI Prudential Balanced Advantage Fund",
+        "HDFC Balanced Advantage Fund",
+        "Nippon India Balanced Advantage Fund"
+      ]
+    },
+    "debt_corporate_bond": {
+      "label": "Debt - Corporate Bond",
+      "direct_ter": 0.003,
+      "regular_ter": 0.0072,
+      "representative_schemes": [
+        "HDFC Corporate Bond Fund",
+        "ICICI Prudential Corporate Bond Fund",
+        "SBI Corporate Bond Fund"
+      ]
+    },
+    "debt_gilt": {
+      "label": "Debt - Gilt",
+      "direct_ter": 0.0034,
+      "regular_ter": 0.008,
+      "representative_schemes": [
+        "ICICI Prudential Gilt Fund",
+        "SBI Magnum Gilt Fund",
+        "HDFC Gilt Fund"
+      ]
+    },
+    "debt_liquid": {
+      "label": "Debt - Liquid",
+      "direct_ter": 0.0014,
+      "regular_ter": 0.0024,
+      "representative_schemes": [
+        "HDFC Liquid Fund",
+        "ICICI Prudential Liquid Fund",
+        "SBI Liquid Fund"
+      ]
+    },
+    "debt_short_duration": {
+      "label": "Debt - Short Duration",
+      "direct_ter": 0.0026,
+      "regular_ter": 0.0068,
+      "representative_schemes": [
+        "ICICI Prudential Short Term Fund",
+        "HDFC Short Term Debt Fund",
+        "SBI Short Term Debt Fund"
+      ]
+    },
+    "commodity_gold": {
+      "label": "Commodity - Gold",
+      "direct_ter": 0.0045,
+      "regular_ter": 0.0095,
+      "representative_schemes": [
+        "Nippon India Gold Savings Fund",
+        "SBI Gold Fund",
+        "ICICI Prudential Gold ETF FOF"
+      ]
+    }
+  }
+}

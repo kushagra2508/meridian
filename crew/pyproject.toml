@@ -1,7 +1,7 @@
 [project]
 name = "meridian-crew"
 version = "0.1.0"
-description = "CrewAI Feasibility agent and its tools for the Meridian wealth platform"
+description = "CrewAI Feasibility, Statute and Channel agents for the Meridian wealth platform"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 dependencies = [
@@ -15,6 +15,7 @@ dependencies = [
 dev = ["pytest>=8.0"]
 
 [project.scripts]
+meridian = "meridian_crew.__main__:main"
 feasibility = "meridian_crew.__main__:main"
 
 [build-system]

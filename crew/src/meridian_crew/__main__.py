@@ -1,8 +1,14 @@
-"""CLI for the Feasibility agent.
+"""CLI for the Meridian agent desk.
 
-    uv run feasibility --target-amount 5000000 --years 7 \
+Default command runs the full pipeline (Feasibility → Statute → Channel):
+
+    uv run meridian \
+      --goal "Daughter's undergraduate tuition" \
+      --target-amount 5000000 --years 7 \
       --current-corpus 900000 --monthly-contribution 25000 \
       --allocation equity_large_cap=30,hybrid_aggressive=20,debt_short_duration=30,debt_liquid=20
+
+Single-agent modes: `--agent feasibility|statute|channel`.
 """
 
 from __future__ import annotations
@@ -11,10 +17,20 @@ import argparse
 import json
 import sys
 
-from .agent import GoalBrief
+from .agent import FeasibilityVerdict, GoalBrief
+from .channel_agent import ChannelBrief, ChannelVerdict
 from .config import llm_model
-from .crew import MissingCredentialsError, run_feasibility
-from .stream import emit, stream_feasibility
+from .crew import (
+    MissingCredentialsError,
+    default_channel_brief,
+    default_switch_brief,
+    run_channel,
+    run_feasibility,
+    run_pipeline,
+    run_statute,
+)
+from .statute_agent import StatuteVerdict, SwitchBrief
+from .stream import emit, stream_channel, stream_feasibility, stream_pipeline, stream_statute
 from .tools.nav_history import category_keys
 
 DEFAULT_ALLOCATION = (
@@ -24,23 +40,54 @@ DEFAULT_ALLOCATION = (
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="feasibility", description="Assess whether a client goal is reachable."
+        prog="meridian",
+        description="Run Feasibility, Statute and Channel agents.",
+    )
+    parser.add_argument(
+        "--agent",
+        choices=("pipeline", "feasibility", "statute", "channel"),
+        default="pipeline",
+        help="Which agent (or the full pipeline) to run. Default: pipeline.",
     )
     parser.add_argument("--goal", default="Unnamed goal", help="What the money is for.")
-    parser.add_argument("--target-amount", type=float, required=True)
-    parser.add_argument("--years", type=float, required=True, dest="years_to_goal")
-    parser.add_argument("--current-corpus", type=float, default=0.0)
-    parser.add_argument("--monthly-contribution", type=float, default=0.0)
+    parser.add_argument("--target-amount", type=float, default=5_000_000.0)
+    parser.add_argument("--years", type=float, default=7.0, dest="years_to_goal")
+    parser.add_argument("--current-corpus", type=float, default=900_000.0)
+    parser.add_argument("--monthly-contribution", type=float, default=25_000.0)
     parser.add_argument(
         "--allocation",
         default=DEFAULT_ALLOCATION,
         help="category=weight pairs in percent, comma separated. Must sum to 100.",
     )
-    parser.add_argument("--client-age", type=int, default=None)
+    parser.add_argument("--client-age", type=int, default=42)
     parser.add_argument("--currency", default="INR")
     parser.add_argument("--step-up", type=float, default=0.0, dest="annual_step_up_pct")
     parser.add_argument("--max-equity-pct", type=float, default=None)
     parser.add_argument("--notes", default=None)
+    parser.add_argument(
+        "--other-income",
+        type=float,
+        default=1_200_000.0,
+        dest="other_taxable_income",
+        help="Taxable income before switch gains (Statute).",
+    )
+    parser.add_argument("--regime", choices=("new", "old"), default="new")
+    parser.add_argument(
+        "--age-band",
+        choices=("below_60", "60_to_80", "80_plus"),
+        default="below_60",
+    )
+    parser.add_argument(
+        "--channel-plan",
+        choices=("regular", "direct"),
+        default="regular",
+        help="Assumed plan type for Channel holdings.",
+    )
+    parser.add_argument(
+        "--disposals",
+        default=None,
+        help="Override Statute disposals as category=rupees pairs.",
+    )
     parser.add_argument("--model", default=None, help=f"Default: {llm_model()}")
     parser.add_argument(
         "--trace", action="store_true", help="Echo each tool call as it happens."
@@ -48,7 +95,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--verbose", action="store_true", help="Full CrewAI reasoning output."
     )
-    parser.add_argument("--json", action="store_true", help="Print the verdict as JSON.")
+    parser.add_argument("--json", action="store_true", help="Print verdicts as JSON.")
     parser.add_argument(
         "--stream",
         action="store_true",
@@ -57,7 +104,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Print the resolved brief and exit without calling the model.",
+        help="Print the resolved brief(s) and exit without calling the model.",
     )
     parser.add_argument(
         "--list-categories", action="store_true", help="Print valid category keys and exit."
@@ -65,13 +112,25 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _render(run) -> str:
-    verdict = run.verdict
-    if verdict is None:
-        return f"Model returned an unparsable answer:\n\n{run.raw}"
+def _goal_brief(args: argparse.Namespace) -> GoalBrief:
+    return GoalBrief(
+        goal=args.goal,
+        target_amount=args.target_amount,
+        years_to_goal=args.years_to_goal,
+        current_corpus=args.current_corpus,
+        monthly_contribution=args.monthly_contribution,
+        allocation=args.allocation,
+        client_age=args.client_age,
+        currency=args.currency,
+        annual_step_up_pct=args.annual_step_up_pct,
+        max_equity_pct=args.max_equity_pct,
+        notes=args.notes,
+    )
 
+
+def _render_feasibility(verdict: FeasibilityVerdict) -> list[str]:
     lines = [
-        f"VERDICT: {verdict.verdict.upper().replace('_', ' ')}",
+        f"FEASIBILITY: {verdict.verdict.upper().replace('_', ' ')}",
         "",
         verdict.headline,
         "",
@@ -86,23 +145,50 @@ def _render(run) -> str:
         )
     if verdict.recommended_shift_pct is not None:
         lines.append(f"  Portfolio to move    {verdict.recommended_shift_pct:g}%")
-
-    for title, items in (
-        ("RECOMMENDED MOVES", verdict.recommended_moves),
-        ("RULED OUT BY THE GOAL DATE", verdict.ruled_out_products),
-        ("OTHER LEVERS", verdict.other_levers),
-        ("RISKS", verdict.risks),
-    ):
-        if items:
-            lines += ["", f"{title}:"] + [f"  - {item}" for item in items]
-
+    if verdict.recommended_moves:
+        lines += ["", "RECOMMENDED MOVES:"] + [
+            f"  - {move}" for move in verdict.recommended_moves
+        ]
     lines += ["", "REASONING:", verdict.reasoning]
-    lines += ["", f"Tools called: {', '.join(run.tools_used) or 'none'}"]
-    if run.usage:
-        total = run.usage.get("total_tokens")
-        if total:
-            lines.append(f"Tokens: {total:,} ({run.model})")
-    return "\n".join(lines)
+    return lines
+
+
+def _render_statute(verdict: StatuteVerdict) -> list[str]:
+    lines = [
+        "STATUTE",
+        "",
+        verdict.headline,
+        "",
+        f"  Total tax            {verdict.total_tax:,.0f}",
+    ]
+    if verdict.sections_applied:
+        lines.append(f"  Sections             {', '.join(verdict.sections_applied)}")
+    if verdict.staging_saves is not None:
+        lines.append(f"  Staging saves        {verdict.staging_saves:,.0f}")
+        lines.append(f"  Recommend staging    {verdict.recommend_staging}")
+    lines += ["", "REASONING:", verdict.reasoning]
+    return lines
+
+
+def _render_channel(verdict: ChannelVerdict) -> list[str]:
+    lines = [
+        "CHANNEL",
+        "",
+        verdict.headline,
+        "",
+        f"  Annual drag          {verdict.annual_drag_rupees:,.0f}",
+        f"  Drag / portfolio     {verdict.annual_drag_pct_of_portfolio * 100:.3f}%",
+    ]
+    if verdict.five_year_drag_rupees is not None:
+        lines.append(f"  Five-year floor      {verdict.five_year_drag_rupees:,.0f}")
+    if verdict.out_of_scope:
+        lines += ["", "OUT OF SCOPE:"] + [f"  - {item}" for item in verdict.out_of_scope]
+    if verdict.recommendations:
+        lines += ["", "RECOMMENDATIONS:"] + [
+            f"  - {item}" for item in verdict.recommendations
+        ]
+    lines += ["", "REASONING:", verdict.reasoning]
+    return lines
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -113,23 +199,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     try:
-        brief = GoalBrief(
-            goal=args.goal,
-            target_amount=args.target_amount,
-            years_to_goal=args.years_to_goal,
-            current_corpus=args.current_corpus,
-            monthly_contribution=args.monthly_contribution,
-            allocation=args.allocation,
-            client_age=args.client_age,
-            currency=args.currency,
-            annual_step_up_pct=args.annual_step_up_pct,
-            max_equity_pct=args.max_equity_pct,
-            notes=args.notes,
-        )
+        goal = _goal_brief(args)
     except ValueError as error:
         if args.stream:
-            # The consumer only reads stdout, so a rejected brief has to arrive
-            # as an event rather than on stderr.
             emit({"type": "error", "message": f"Invalid brief: {error}"})
             emit({"type": "status", "state": "halted", "label": "Invalid brief"})
             return 2
@@ -137,16 +209,156 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     if args.stream:
-        return stream_feasibility(brief, model=args.model)
+        if args.agent == "feasibility":
+            return stream_feasibility(goal, model=args.model)
+        if args.agent == "statute":
+            switch = SwitchBrief(
+                purpose=f"Switch for: {goal.goal}",
+                disposals=args.disposals
+                or "debt_liquid=180000,equity_large_cap=120000",
+                other_taxable_income=args.other_taxable_income,
+                regime=args.regime,
+                age_band=args.age_band,
+                notes=args.notes,
+            )
+            return stream_statute(switch, model=args.model)
+        if args.agent == "channel":
+            channel = default_channel_brief(goal, plan=args.channel_plan)
+            return stream_channel(channel, model=args.model)
+        return stream_pipeline(
+            goal,
+            model=args.model,
+            other_taxable_income=args.other_taxable_income,
+            regime=args.regime,
+            age_band=args.age_band,
+            channel_plan=args.channel_plan,
+        )
 
     if args.dry_run:
-        print(brief.as_prompt_block())
+        print("=== Feasibility brief ===")
+        print(goal.as_prompt_block())
+        if args.agent in {"pipeline", "statute"}:
+            preview = default_switch_brief(
+                goal,
+                None,
+                other_taxable_income=args.other_taxable_income,
+                regime=args.regime,
+                age_band=args.age_band,
+            )
+            if args.disposals:
+                preview = SwitchBrief(
+                    purpose=preview.purpose,
+                    disposals=args.disposals,
+                    other_taxable_income=args.other_taxable_income,
+                    regime=args.regime,
+                    age_band=args.age_band,
+                )
+            print("\n=== Statute brief (pre-feasibility preview) ===")
+            print(preview.as_prompt_block())
+        if args.agent in {"pipeline", "channel"}:
+            print("\n=== Channel brief ===")
+            print(default_channel_brief(goal, plan=args.channel_plan).as_prompt_block())
         print(f"\nModel that would run: {args.model or llm_model()}")
         return 0
 
     try:
-        run = run_feasibility(
-            brief, model=args.model, verbose=args.verbose, trace=args.trace
+        if args.agent == "feasibility":
+            run = run_feasibility(
+                goal, model=args.model, verbose=args.verbose, trace=args.trace
+            )
+            if args.json:
+                print(
+                    json.dumps(
+                        {
+                            "agent": run.agent,
+                            "model": run.model,
+                            "tools_used": run.tools_used,
+                            "verdict": run.verdict.model_dump() if run.verdict else None,
+                            "raw": None if run.verdict else run.raw,
+                        },
+                        indent=2,
+                    )
+                )
+            else:
+                print()
+                if isinstance(run.verdict, FeasibilityVerdict):
+                    print("\n".join(_render_feasibility(run.verdict)))
+                else:
+                    print(run.raw)
+                print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
+            return 0 if run.verdict else 1
+
+        if args.agent == "statute":
+            switch = SwitchBrief(
+                purpose=f"Switch for: {goal.goal}",
+                disposals=args.disposals
+                or "debt_liquid=180000,equity_large_cap=270000",
+                other_taxable_income=args.other_taxable_income,
+                regime=args.regime,
+                age_band=args.age_band,
+                notes=args.notes,
+            )
+            run = run_statute(
+                switch, model=args.model, verbose=args.verbose, trace=args.trace
+            )
+            if args.json:
+                print(
+                    json.dumps(
+                        {
+                            "agent": run.agent,
+                            "model": run.model,
+                            "tools_used": run.tools_used,
+                            "verdict": run.verdict.model_dump() if run.verdict else None,
+                            "raw": None if run.verdict else run.raw,
+                        },
+                        indent=2,
+                    )
+                )
+            else:
+                print()
+                if isinstance(run.verdict, StatuteVerdict):
+                    print("\n".join(_render_statute(run.verdict)))
+                else:
+                    print(run.raw)
+                print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
+            return 0 if run.verdict else 1
+
+        if args.agent == "channel":
+            channel = default_channel_brief(goal, plan=args.channel_plan)
+            run = run_channel(
+                channel, model=args.model, verbose=args.verbose, trace=args.trace
+            )
+            if args.json:
+                print(
+                    json.dumps(
+                        {
+                            "agent": run.agent,
+                            "model": run.model,
+                            "tools_used": run.tools_used,
+                            "verdict": run.verdict.model_dump() if run.verdict else None,
+                            "raw": None if run.verdict else run.raw,
+                        },
+                        indent=2,
+                    )
+                )
+            else:
+                print()
+                if isinstance(run.verdict, ChannelVerdict):
+                    print("\n".join(_render_channel(run.verdict)))
+                else:
+                    print(run.raw)
+                print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
+            return 0 if run.verdict else 1
+
+        pipeline = run_pipeline(
+            goal,
+            other_taxable_income=args.other_taxable_income,
+            regime=args.regime,
+            age_band=args.age_band,
+            channel_plan=args.channel_plan,
+            model=args.model,
+            verbose=args.verbose,
+            trace=args.trace,
         )
     except MissingCredentialsError as error:
         print(str(error), file=sys.stderr)
@@ -154,24 +366,53 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.json:
         payload = {
-            "model": run.model,
-            "tools_used": run.tools_used,
-            "usage": run.usage,
-            "verdict": run.verdict.model_dump() if run.verdict else None,
-            "raw": None if run.verdict else run.raw,
+            "model": pipeline.model,
+            "feasibility": {
+                "tools_used": pipeline.feasibility.tools_used,
+                "verdict": (
+                    pipeline.feasibility.verdict.model_dump()
+                    if pipeline.feasibility.verdict
+                    else None
+                ),
+            },
+            "statute": {
+                "tools_used": pipeline.statute.tools_used if pipeline.statute else [],
+                "verdict": (
+                    pipeline.statute.verdict.model_dump()
+                    if pipeline.statute and pipeline.statute.verdict
+                    else None
+                ),
+            },
+            "channel": {
+                "tools_used": pipeline.channel.tools_used if pipeline.channel else [],
+                "verdict": (
+                    pipeline.channel.verdict.model_dump()
+                    if pipeline.channel and pipeline.channel.verdict
+                    else None
+                ),
+            },
         }
         print(json.dumps(payload, indent=2))
     else:
         print()
-        print(_render(run))
+        if isinstance(pipeline.feasibility.verdict, FeasibilityVerdict):
+            print("\n".join(_render_feasibility(pipeline.feasibility.verdict)))
+        else:
+            print("FEASIBILITY failed:\n", pipeline.feasibility.raw)
+        print("\n" + "=" * 60 + "\n")
+        if pipeline.statute and isinstance(pipeline.statute.verdict, StatuteVerdict):
+            print("\n".join(_render_statute(pipeline.statute.verdict)))
+        else:
+            print("STATUTE failed:\n", pipeline.statute.raw if pipeline.statute else "")
+        print("\n" + "=" * 60 + "\n")
+        if pipeline.channel and isinstance(pipeline.channel.verdict, ChannelVerdict):
+            print("\n".join(_render_channel(pipeline.channel.verdict)))
+        else:
+            print("CHANNEL failed:\n", pipeline.channel.raw if pipeline.channel else "")
+        tools = ", ".join(c.name for c in pipeline.tool_calls) or "none"
+        print(f"\nTools called: {tools}")
 
-    if run.tool_errors:
-        print(
-            f"\n{len(run.tool_errors)} tool call(s) failed: "
-            + ", ".join(f"{c.name} ({c.error})" for c in run.tool_errors),
-            file=sys.stderr,
-        )
-    return 0 if run.verdict else 1
+    return 0 if pipeline.ok else 1
 
 
 if __name__ == "__main__":

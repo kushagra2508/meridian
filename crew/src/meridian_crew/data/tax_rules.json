@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "financial_year": "2025-26",
+  "assessment_year": "2026-27",
+  "jurisdiction": "India",
+  "applies_to": "Resident individual. HUFs, NRIs, trusts and companies are out of scope.",
+  "source": "Income-tax Act 1961 as amended by the Finance (No. 2) Act 2024 and the Finance Act 2025.",
+  "notes": [
+    "Rates below are the ones in force for transfers on or after 23 July 2024, when the Finance (No. 2) Act 2024 reset the capital gains regime.",
+    "This is a hand-maintained rule table, not a live statute feed. Re-check it every Budget."
+  ],
+  "capital_gains": {
+    "equity_ltcg_112a": {
+      "section": "112A",
+      "label": "Long-term capital gains on equity-oriented units",
+      "rate": 0.125,
+      "annual_exemption": 125000,
+      "min_holding_months": 12,
+      "indexation": false,
+      "basis": "Section 112A: 12.5% on aggregate LTCG above Rs 1,25,000 in a financial year, STT paid, no indexation.",
+      "effective_from": "2024-07-23"
+    },
+    "equity_stcg_111a": {
+      "section": "111A",
+      "label": "Short-term capital gains on equity-oriented units",
+      "rate": 0.2,
+      "min_holding_months": 12,
+      "basis": "Section 111A: 20% on gains from equity-oriented units held 12 months or less, STT paid.",
+      "effective_from": "2024-07-23"
+    },
+    "specified_mutual_fund": {
+      "section": "50AA",
+      "label": "Debt-oriented units - deemed short term",
+      "treatment": "slab",
+      "basis": "Section 50AA: units of a specified mutual fund (more than 65% in debt and money market instruments) are deemed short-term whatever the holding period, and taxed at the slab rate.",
+      "acquired_on_or_after": "2023-04-01"
+    },
+    "legacy_debt_ltcg": {
+      "section": "112",
+      "label": "Debt units bought before 1 April 2023, held over 24 months",
+      "rate": 0.125,
+      "min_holding_months": 24,
+      "indexation": false,
+      "basis": "Section 112: units acquired before 1 April 2023 sit outside section 50AA. Held over 24 months they are long-term at 12.5% without indexation.",
+      "effective_from": "2024-07-23"
+    },
+    "other_asset_ltcg": {
+      "section": "112",
+      "label": "Gold funds and other non-equity, non-specified assets",
+      "rate": 0.125,
+      "min_holding_months": 24,
+      "indexation": false,
+      "basis": "Section 112: 12.5% without indexation once held over 24 months. Below that the gain is short-term and taxed at the slab rate."
+    }
+  },
+  "category_treatment": {
+    "equity_large_cap": "equity_oriented",
+    "equity_flexi_cap": "equity_oriented",
+    "equity_mid_cap": "equity_oriented",
+    "equity_small_cap": "equity_oriented",
+    "equity_elss": "equity_oriented",
+    "index_nifty50": "equity_oriented",
+    "hybrid_aggressive": "equity_oriented",
+    "hybrid_balanced_advantage": "equity_oriented",
+    "debt_corporate_bond": "specified_mutual_fund",
+    "debt_gilt": "specified_mutual_fund",
+    "debt_liquid": "specified_mutual_fund",
+    "debt_short_duration": "specified_mutual_fund",
+    "commodity_gold": "other_asset"
+  },
+  "treatment_notes": {
+    "equity_oriented": "At least 65% of the scheme in domestic equity, so sections 111A and 112A apply.",
+    "specified_mutual_fund": "Deemed short-term under section 50AA and taxed at the slab rate, unless the units were bought before 1 April 2023.",
+    "other_asset": "Neither equity-oriented nor a specified mutual fund. Gold fund-of-funds sit here after the Finance Act 2025 amendment to section 50AA."
+  },
+  "category_caveats": {
+    "debt_liquid": "This category also stands in for arbitrage funds in the product catalogue. An arbitrage fund is equity-oriented for tax and would be priced under 111A/112A instead.",
+    "hybrid_balanced_advantage": "Equity-oriented only while the scheme keeps gross equity exposure at or above 65%. Check the scheme's own disclosure before relying on it."
+  },
+  "slabs": {
+    "new": {
+      "label": "New regime, section 115BAC(1A)",
+      "basic_exemption": 400000,
+      "age_bands": false,
+      "bands": [
+        { "upto": 400000, "rate": 0.0 },
+        { "upto": 800000, "rate": 0.05 },
+        { "upto": 1200000, "rate": 0.1 },
+        { "upto": 1600000, "rate": 0.15 },
+        { "upto": 2000000, "rate": 0.2 },
+        { "upto": 2400000, "rate": 0.25 },
+        { "upto": null, "rate": 0.3 }
+      ]
+    },
+    "old": {
+      "label": "Old regime",
+      "age_bands": true,
+      "basic_exemption_by_age": {
+        "below_60": 250000,
+        "60_to_80": 300000,
+        "80_plus": 500000
+      },
+      "bands": [
+        { "upto": 250000, "rate": 0.0 },
+        { "upto": 500000, "rate": 0.05 },
+        { "upto": 1000000, "rate": 0.2 },
+        { "upto": null, "rate": 0.3 }
+      ]
+    }
+  },
+  "rebate_87a": {
+    "new": {
+      "income_ceiling": 1200000,
+      "max_rebate": 60000,
+      "basis": "Section 87A: full rebate where total income does not exceed Rs 12,00,000, with marginal relief just above it. Income taxed at the special rates in sections 111A and 112A is excluded from the rebate."
+    },
+    "old": {
+      "income_ceiling": 500000,
+      "max_rebate": 12500,
+      "basis": "Section 87A: rebate of up to Rs 12,500 where total income does not exceed Rs 5,00,000."
+    }
+  },
+  "surcharge": {
+    "special_rate_cap": 0.15,
+    "special_rate_cap_basis": "Proviso to section 2 of the Finance Act: surcharge on tax computed under sections 111A, 112A, 112 and on dividend income is capped at 15%.",
+    "marginal_relief": true,
+    "bands": {
+      "new": [
+        { "above": 5000000, "upto": 10000000, "rate": 0.1 },
+        { "above": 10000000, "upto": 20000000, "rate": 0.15 },
+        { "above": 20000000, "upto": null, "rate": 0.25 }
+      ],
+      "old": [
+        { "above": 5000000, "upto": 10000000, "rate": 0.1 },
+        { "above": 10000000, "upto": 20000000, "rate": 0.15 },
+        { "above": 20000000, "upto": 50000000, "rate": 0.25 },
+        { "above": 50000000, "upto": null, "rate": 0.37 }
+      ]
+    },
+    "note": "The 37% band was withdrawn under the new regime, so the highest surcharge there is 25%."
+  },
+  "cess": {
+    "name": "Health and Education Cess",
+    "rate": 0.04,
+    "basis": "4% of income tax plus surcharge."
+  },
+  "basic_exemption_absorption": {
+    "available": true,
+    "basis": "Provisos to sections 111A(1) and 112A(2): a resident individual whose other income falls short of the basic exemption limit may set the shortfall against gains taxed at those special rates."
+  }
+}

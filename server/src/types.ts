@@ -112,6 +112,20 @@ export interface IntelligenceReports {
   sentiment: Sentiment
 }
 
+export interface AgentReportMetric {
+  label: string
+  value: string
+}
+
+export interface AgentReport {
+  agent: string
+  title: string
+  headline: string
+  verdict?: string
+  metrics?: AgentReportMetric[]
+  bullets?: string[]
+}
+
 export type AgentEvent =
   | { type: 'log'; id: string; at: string; source: string; message: string; highlight?: string }
   | { type: 'tool_call'; id: string; at: string; name: string; args: string; status: 'running' }
@@ -123,6 +137,13 @@ export type AgentEvent =
       status: 'ok' | 'error'
       summary: string
     }
-  | { type: 'message'; id: string; at: string; source: string; text: string }
+  | {
+      type: 'message'
+      id: string
+      at: string
+      source: string
+      text: string
+      report?: AgentReport
+    }
   | { type: 'status'; id: string; state: 'thinking' | 'idle' | 'halted'; label: string }
   | { type: 'done'; id: string; at: string; summary: string }

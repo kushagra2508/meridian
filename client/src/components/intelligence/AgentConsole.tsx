@@ -1,11 +1,26 @@
 import { useEffect, useRef, useState } from 'react'
 import { Icon } from '../Icon'
-import { useAgentRun, type ConsoleItem } from '../../hooks/useAgentRun'
+import type { AgentStatus, ConsoleItem } from '../../hooks/useAgentRun'
 
-const DEFAULT_PROMPT = 'Review portfolio exposure and surface actionable alpha.'
+const DEFAULT_PROMPT = 'Can we fund tuition with the current plan?'
 
-export function AgentConsole() {
-  const { items, status, running, error, start, halt } = useAgentRun(DEFAULT_PROMPT)
+interface AgentConsoleProps {
+  items: ConsoleItem[]
+  status: AgentStatus
+  running: boolean
+  error: string | null
+  onStart: (prompt: string) => void
+  onHalt: () => void
+}
+
+export function AgentConsole({
+  items,
+  status,
+  running,
+  error,
+  onStart,
+  onHalt,
+}: AgentConsoleProps) {
   const [draft, setDraft] = useState('')
   const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -19,7 +34,7 @@ export function AgentConsole() {
     const prompt = draft.trim()
     if (!prompt || running) return
     setDraft('')
-    start(prompt)
+    onStart(prompt)
   }
 
   return (
@@ -36,7 +51,7 @@ export function AgentConsole() {
           </div>
           <div>
             <h3 className="m-0 font-body text-body font-bold leading-tight text-white">
-              Analyst-7
+              Meridian desk
             </h3>
             <span className="font-footnote text-footnote uppercase tracking-wider text-secondary-fixed">
               {status.label}
@@ -46,7 +61,7 @@ export function AgentConsole() {
 
         <button
           type="button"
-          onClick={halt}
+          onClick={onHalt}
           disabled={!running}
           title="Halt agent"
           aria-label="Halt agent"
@@ -82,8 +97,8 @@ export function AgentConsole() {
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
             disabled={running}
-            aria-label="Direct Analyst-7"
-            placeholder={running ? 'Agent is working...' : 'Direct Analyst-7...'}
+            aria-label="Direct Meridian desk"
+            placeholder={running ? 'Desk is working...' : DEFAULT_PROMPT}
             className="w-full rounded-lg border border-console-border bg-console-bg py-2 pl-3 pr-10 font-body text-body text-white transition-all placeholder:text-console-dim focus:border-secondary-fixed focus:outline-none focus:ring-1 focus:ring-secondary-fixed disabled:opacity-60"
           />
           <button
@@ -153,7 +168,7 @@ function ConsoleRow({ item }: { item: ConsoleItem }) {
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-console-border">
             <div
-              className="h-full bg-secondary-fixed shadow-[0_0_8px_rgba(97,255,151,0.5)] transition-[width] duration-500"
+              className="h-full bg-secondary-fixed transition-[width] duration-500"
               style={{ width: `${item.percent}%` }}
             />
           </div>

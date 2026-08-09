@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { subscribeToAgentRun } from '../lib/api'
-import type { AgentEvent } from '../lib/types'
+import type { AgentEvent, AgentReport } from '../lib/types'
 
 export type ConsoleItem =
   | { kind: 'log'; id: string; at: string; source: string; message: string; highlight?: string }
@@ -23,6 +23,11 @@ export interface AgentStatus {
   label: string
 }
 
+export interface AgentReportCard extends AgentReport {
+  id: string
+  at: string
+}
+
 function reduceEvent(items: ConsoleItem[], event: AgentEvent): ConsoleItem[] {
   switch (event.type) {
     case 'log':
@@ -38,9 +43,16 @@ function reduceEvent(items: ConsoleItem[], event: AgentEvent): ConsoleItem[] {
         },
       ]
     case 'message':
+      // Structured reports render in the middle panel; keep a short console echo.
       return [
         ...items,
-        { kind: 'message', id: event.id, at: event.at, source: event.source, text: event.text },
+        {
+          kind: 'message',
+          id: event.id,
+          at: event.at,
+          source: event.source,
+          text: event.report ? `${event.report.title}: ${event.text}` : event.text,
+        },
       ]
     case 'tool_call':
       return [
@@ -77,6 +89,7 @@ const IDLE_STATUS: AgentStatus = { state: 'idle', label: 'Standing by' }
 
 export function useAgentRun(initialPrompt: string) {
   const [items, setItems] = useState<ConsoleItem[]>([])
+  const [reports, setReports] = useState<AgentReportCard[]>([])
   const [status, setStatus] = useState<AgentStatus>(IDLE_STATUS)
   const [running, setRunning] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -96,6 +109,7 @@ export function useAgentRun(initialPrompt: string) {
       const generation = generationRef.current
 
       setItems([])
+      setReports([])
       setError(null)
       setRunning(true)
       setStatus({ state: 'thinking', label: 'Connecting to engine' })
@@ -106,6 +120,12 @@ export function useAgentRun(initialPrompt: string) {
           if (event.type === 'status') {
             setStatus({ state: event.state, label: event.label })
             return
+          }
+          if (event.type === 'message' && event.report) {
+            setReports((current) => [
+              ...current,
+              { ...event.report!, id: event.id, at: event.at },
+            ])
           }
           setItems((current) => reduceEvent(current, event))
         },
@@ -122,8 +142,6 @@ export function useAgentRun(initialPrompt: string) {
     [teardown],
   )
 
-  // Closing the stream is what halts the run: the server aborts the provider
-  // when the request ends.
   const halt = useCallback(() => {
     teardown()
     setRunning(false)
@@ -133,9 +151,8 @@ export function useAgentRun(initialPrompt: string) {
   useEffect(() => {
     start(initialPrompt)
     return teardown
-    // Kicks off exactly one run when the console mounts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return { items, status, running, error, start, halt }
+  return { items, reports, status, running, error, start, halt }
 }
