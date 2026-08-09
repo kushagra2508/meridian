@@ -3,6 +3,12 @@ import type { AgentEvent } from '../types.js'
 export interface AgentRunInput {
   prompt: string
   signal: AbortSignal
+  /**
+   * Structured brief fields, when the caller has them. The mock provider ignores
+   * these; a real agent needs numbers rather than a sentence, and guessing them
+   * out of the prompt would be worse than asking for them.
+   */
+  params?: Record<string, string>
 }
 
 /**

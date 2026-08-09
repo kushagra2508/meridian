@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { Router, type Request } from 'express'
 import { resolveAgentProvider } from '../agents/index.js'
 
 const provider = resolveAgentProvider()
@@ -15,12 +15,43 @@ agentRouter.get('/provider', (_req, res) => {
  * request may land on a different serverless instance, and it lets the client
  * halt a run simply by closing the stream.
  */
+/**
+ * Brief fields a provider may accept alongside the prompt. Listed explicitly so
+ * that a query string cannot reach the provider with anything else.
+ */
+const BRIEF_PARAMS = [
+  'goal',
+  'target-amount',
+  'years',
+  'current-corpus',
+  'monthly-contribution',
+  'client-age',
+  'currency',
+  'step-up',
+  'max-equity-pct',
+  'allocation',
+] as const
+
+function readBriefParams(query: Request['query']): Record<string, string> {
+  const params: Record<string, string> = {}
+
+  for (const key of BRIEF_PARAMS) {
+    const value = query[key]
+    if (typeof value === 'string' && value.trim().length > 0) {
+      params[key] = value.trim()
+    }
+  }
+
+  return params
+}
+
 agentRouter.get('/stream', async (req, res) => {
   const requested = req.query.prompt
   const prompt =
     typeof requested === 'string' && requested.trim().length > 0
       ? requested.trim()
       : 'Review portfolio exposure and surface actionable alpha.'
+  const params = readBriefParams(req.query)
 
   res.writeHead(200, {
     'Content-Type': 'text/event-stream',
@@ -36,7 +67,11 @@ agentRouter.get('/stream', async (req, res) => {
   req.on('close', () => controller.abort())
 
   try {
-    for await (const event of provider.startRun({ prompt, signal: controller.signal })) {
+    for await (const event of provider.startRun({
+      prompt,
+      params,
+      signal: controller.signal,
+    })) {
       res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`)
     }
   } catch (error) {

@@ -1,8 +1,15 @@
+import { CrewAgentProvider } from './crewProvider.js'
 import { MockAgentProvider } from './mockProvider.js'
 import type { AgentProvider } from './provider.js'
 
+/**
+ * `mock` stays the default because it is the only provider that runs anywhere.
+ * `crew` shells out to a local Python environment, which a Node serverless
+ * deployment does not have, so it is opt-in via AGENT_PROVIDER=crew.
+ */
 const providers: Record<string, () => AgentProvider> = {
   mock: () => new MockAgentProvider(),
+  crew: () => new CrewAgentProvider(),
 }
 
 export function resolveAgentProvider(

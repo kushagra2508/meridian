@@ -40,7 +40,8 @@ client/                 Vite + React + TypeScript SPA
 server/
   src/routes/           portfolio, intelligence, agent
   src/data/             dummy fixtures
-  src/agents/           AgentProvider interface + mock implementation
+  src/agents/           AgentProvider interface + mock and CrewAI implementations
+crew/                   CrewAI Feasibility agent (Python), see crew/README.md
 ```
 
 ## Routes
@@ -66,10 +67,32 @@ serverless instance. Closing the stream halts the run.
 
 ## Agent engine
 
-All agent output currently comes from `MockAgentProvider`, which replays a scripted multi-agent run
-over SSE. The provider is chosen by the `AGENT_PROVIDER` environment variable
-(`mock` by default) and implements a single interface in `server/src/agents/provider.ts`, so the
-CrewAI service can be added as another provider without touching the client.
+Agent output comes from an `AgentProvider`, a single interface in
+`server/src/agents/provider.ts` chosen by the `AGENT_PROVIDER` environment variable. Both
+implementations emit the same event union, so the client renders either without knowing which
+is running.
+
+| `AGENT_PROVIDER` | Behaviour                                                                      |
+| ---------------- | ------------------------------------------------------------------------------ |
+| `mock` (default) | Replays a scripted multi-agent run. No dependencies, runs anywhere.            |
+| `crew`           | Runs the real CrewAI Feasibility agent in `crew/` and streams its actual work.  |
+
+`crew` spawns `python -m meridian_crew --stream` and translates its newline-delimited JSON
+into SSE events, which is why it needs a local Python environment (see `crew/README.md`) and
+why `mock` remains the default: the Vercel deployment is Node-only and cannot run Python, so
+the hosted demo streams the mock while `crew` is selected when running locally.
+
+The `/api/agent/stream` endpoint accepts optional brief fields alongside `prompt` —
+`target-amount`, `years`, `current-corpus`, `monthly-contribution`, `client-age`,
+`allocation`, `max-equity-pct`, `step-up`, `currency`, `goal`. The `crew` provider falls back
+to a worked tuition example when they are absent, because a real agent needs numbers and
+guessing them out of a sentence would be worse than defaulting.
+
+```bash
+# Stream the real agent locally
+cd crew && uv venv --python 3.12 && uv pip install -e ".[dev]" && cp .env.example .env
+cd ../server && AGENT_PROVIDER=crew npm run dev
+```
 
 ## Environment
 
@@ -78,4 +101,7 @@ CrewAI service can be added as another provider without touching the client.
 ```
 PORT=4000
 AGENT_PROVIDER=mock
+# Only read by the crew provider; both default to crew/ beside the server.
+CREW_DIR=../crew
+CREW_PYTHON=../crew/.venv/bin/python
 ```

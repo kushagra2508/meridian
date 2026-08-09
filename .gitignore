@@ -12,3 +12,5 @@ coverage/
 .vercel/
 .vercel
 .env*
+# Templates carry no secrets and are the only record of what a real .env needs.
+!.env.example
