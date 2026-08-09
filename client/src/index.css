@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* STATUTE range inputs — hairline track, ink thumb */
+input[type='range'].accent-primary,
+input[type='range'].accent-secondary,
+.statute-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  background: transparent;
+}
+input[type='range']::-webkit-slider-runnable-track {
+  height: 2px;
+  background: #d9d4c7;
+}
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 12px;
+  width: 4px;
+  background: #003025;
+  margin-top: -5px;
+  cursor: pointer;
+}
+input[type='range']::-moz-range-track {
+  height: 2px;
+  background: #d9d4c7;
+}
+input[type='range']::-moz-range-thumb {
+  height: 12px;
+  width: 4px;
+  background: #003025;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

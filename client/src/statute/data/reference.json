@@ -1,0 +1,59 @@
+{
+  "generated_at": "2026-08-09T18:40:00+05:30",
+  "categories": {
+    "equity_mf": {
+      "cagr": 0.142,
+      "vol": 0.171,
+      "source": "mfapi.in",
+      "schemes": [118834, 120503, 122639],
+      "proxy": false
+    },
+    "debt_mf": {
+      "cagr": 0.071,
+      "vol": 0.021,
+      "source": "mfapi.in",
+      "schemes": [119551, 120163, 125354],
+      "proxy": false
+    },
+    "direct_equity": {
+      "cagr": 0.131,
+      "vol": 0.158,
+      "source": "mfapi.in",
+      "schemes": [120716],
+      "proxy": true,
+      "proxy_note": "Nifty 50 index fund used as broad-market proxy. Actual holdings unknown."
+    },
+    "gold": {
+      "cagr": 0.118,
+      "vol": 0.142,
+      "source": "mfapi.in",
+      "schemes": [120834],
+      "proxy": false
+    },
+    "fd_cash": {
+      "cagr": 0.067,
+      "vol": 0.0,
+      "source": "SBI retail FD card, 08 Aug 2026",
+      "proxy": false
+    },
+    "real_estate": {
+      "cagr": 0.0,
+      "vol": 0.0,
+      "source": null,
+      "excluded": true,
+      "exclusion_note": "No sourceable per-client valuation. Held as non-growing, non-liquid corpus."
+    }
+  },
+  "ter_spread": {
+    "equity_mf": 0.0075,
+    "debt_mf": 0.004,
+    "source": "AMFI scheme TER disclosures, 08 Aug 2026",
+    "scope_note": "Plan-type spread exists only for mutual funds."
+  },
+  "sebi_minimums": {
+    "pms": 5000000,
+    "aif": 10000000,
+    "uhni": 20000000
+  },
+  "aif_lockin_years": 7
+}

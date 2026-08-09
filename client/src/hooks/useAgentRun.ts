@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { subscribeToAgentRun } from '../lib/api'
 import type { AgentEvent, AgentReport } from '../lib/types'
 
@@ -87,7 +87,7 @@ function reduceEvent(items: ConsoleItem[], event: AgentEvent): ConsoleItem[] {
 
 const IDLE_STATUS: AgentStatus = { state: 'idle', label: 'Standing by' }
 
-export function useAgentRun(initialPrompt: string) {
+export function useAgentRun(_initialPrompt?: string) {
   const [items, setItems] = useState<ConsoleItem[]>([])
   const [reports, setReports] = useState<AgentReportCard[]>([])
   const [status, setStatus] = useState<AgentStatus>(IDLE_STATUS)
@@ -147,12 +147,6 @@ export function useAgentRun(initialPrompt: string) {
     setRunning(false)
     setStatus({ state: 'halted', label: 'Halted by operator' })
   }, [teardown])
-
-  useEffect(() => {
-    start(initialPrompt)
-    return teardown
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   return { items, reports, status, running, error, start, halt }
 }

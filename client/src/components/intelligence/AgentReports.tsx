@@ -12,10 +12,20 @@ interface AgentReportsProps {
   reports: AgentReportCard[]
   running: boolean
   statusLabel: string
+  expectedCount?: number
+  pendingAgent?: string | null
 }
 
-export function AgentReports({ reports, running, statusLabel }: AgentReportsProps) {
-  if (reports.length === 0) {
+export function AgentReports({
+  reports,
+  running,
+  statusLabel,
+  expectedCount = 0,
+  pendingAgent = null,
+}: AgentReportsProps) {
+  const awaiting = running && expectedCount > 0 && reports.length < expectedCount
+
+  if (reports.length === 0 && !awaiting) {
     return (
       <div className="glass-panel-light flex min-h-40 flex-col items-start justify-center rounded-xl p-gutter">
         <p className="font-section-kicker text-[11px] uppercase tracking-wider text-on-surface-variant">
@@ -44,7 +54,9 @@ export function AgentReports({ reports, running, statusLabel }: AgentReportsProp
           </h3>
         </div>
         <span className="font-footnote text-footnote text-on-surface-variant">
-          {running ? statusLabel : `${reports.length} stage${reports.length === 1 ? '' : 's'}`}
+          {running
+            ? statusLabel
+            : `${reports.length}${expectedCount ? ` / ${expectedCount}` : ''} stage${reports.length === 1 ? '' : 's'}`}
         </span>
       </div>
 
@@ -92,6 +104,15 @@ export function AgentReports({ reports, running, statusLabel }: AgentReportsProp
             ) : null}
           </article>
         ))}
+
+        {awaiting ? (
+          <div className="animate-pulse rounded-xl border border-dashed border-outline-variant bg-surface-container-low/60 p-gutter">
+            <p className="font-section-kicker text-[11px] uppercase tracking-wider text-on-surface-variant">
+              {pendingAgent ? `${pendingAgent} deliberating` : 'Next stage'}
+            </p>
+            <p className="mt-2 font-body text-body text-on-surface-variant">{statusLabel}</p>
+          </div>
+        ) : null}
       </div>
     </div>
   )

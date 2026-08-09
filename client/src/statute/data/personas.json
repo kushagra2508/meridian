@@ -1,0 +1,41 @@
+{
+  "defaultPersonaId": "P2",
+  "personas": [
+    {
+      "id": "P2",
+      "label": "Smart Risk Taker",
+      "handoff": {
+        "persona": "P2 · Smart Risk Taker",
+        "priorityTier": 1,
+        "declaredIncomeBand": "50L-1Cr",
+        "declaredIncomeLabel": "₹70,00,000 – ₹1,00,00,000",
+        "channelUsed": "WhatsApp campaign",
+        "pursueDecision": "PURSUE",
+        "futureEvents": [
+          { "label": "ESOP buyback (Mar 2026)", "year": 2026 },
+          { "label": "Marriage (2028)", "year": 2028 }
+        ],
+        "acquisitionCost": 18500
+      },
+      "typicalPosition": {
+        "totalWealth": 124500000,
+        "alloc": {
+          "equity_mf": 0.35,
+          "debt_mf": 0.2,
+          "fd_cash": 0.15,
+          "direct_equity": 0.1,
+          "gold": 0.05,
+          "real_estate": 0.15
+        },
+        "channel": { "direct": 0.4, "distributor": 0.6 },
+        "unrealisedGainPct": 0.25
+      },
+      "typicalGoal": {
+        "amount": 500000000,
+        "year": 2033,
+        "purpose": "retirement",
+        "note": "Corpus target sized so observed position must reallocate or reframe."
+      }
+    }
+  ]
+}
