@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react'
+import { useAgentDeskConsole } from '../../hooks/useAgentDeskConsole'
 import { useAgentRun } from '../../hooks/useAgentRun'
 import { useSequentialVerdicts } from '../../hooks/useSequentialVerdicts'
 import { committeeToReports } from '../../edge/mapToReports'
@@ -41,6 +42,15 @@ export function CommitteeStep() {
     start(DEFAULT_PROMPT)
   }, [committeeKey, start])
 
+  const desk = useAgentDeskConsole({
+    deskReports,
+    liveItems: items,
+    liveStatus: status,
+    liveRunning: running,
+    liveError: agentError,
+    runKey: committeeKey,
+  })
+
   const hasRethink = committee.positions.some((p) => p.agent === 'rethink')
 
   return (
@@ -56,7 +66,7 @@ export function CommitteeStep() {
             {hasRethink ? ' → Rethink' : ''} → Verdict. Numbers update instantly; each stage
             advances within 5s even if the stream stalls.
           </p>
-          {usedCache || agentError ? (
+          {usedCache || agentError || desk.usingFallback ? (
             <p className="mt-2 inline-flex bg-surface-container-high px-2 py-1 font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant">
               Reasoning cached · offline-safe
             </p>
@@ -95,10 +105,10 @@ export function CommitteeStep() {
       </section>
 
       <AgentConsole
-        items={items}
-        status={status}
-        running={running}
-        error={agentError}
+        items={desk.items}
+        status={desk.status}
+        running={desk.running}
+        error={desk.error}
         onStart={start}
         onHalt={halt}
       />

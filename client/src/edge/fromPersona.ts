@@ -61,6 +61,7 @@ export function seedFromPersona(persona: PersonaRecord): {
   return {
     handoff: {
       ...persona.handoff,
+      clientName: persona.name,
       pursueDecision: persona.handoff.pursueDecision as Handoff['pursueDecision'],
       futureEvents: [...persona.handoff.futureEvents],
     },

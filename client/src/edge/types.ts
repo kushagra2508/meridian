@@ -23,6 +23,7 @@ export type Goal = {
 }
 
 export type Handoff = {
+  clientName: string
   persona: string
   priorityTier: number
   declaredIncomeBand: string

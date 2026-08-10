@@ -3,6 +3,7 @@
   "personas": [
     {
       "id": "P1",
+      "name": "Arjun Mehta",
       "label": "Aspiring High Roller",
       "round1": {
         "age": 34,
@@ -44,6 +45,7 @@
     },
     {
       "id": "P2",
+      "name": "Rohan Kapoor",
       "label": "Smart Risk Taker",
       "round1": {
         "age": 42,
@@ -86,6 +88,7 @@
     },
     {
       "id": "P3",
+      "name": "Meera Subramaniam",
       "label": "Steady Wealth Builder",
       "round1": {
         "age": 51,
@@ -127,6 +130,7 @@
     },
     {
       "id": "P4",
+      "name": "Vikram Deshpande",
       "label": "Disciplined Saver",
       "round1": {
         "age": 60,

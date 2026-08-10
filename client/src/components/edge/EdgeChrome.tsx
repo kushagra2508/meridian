@@ -134,8 +134,13 @@ function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
       </div>
 
       <div className="flex items-center gap-stack-dense">
-        <span className="hidden font-data-md text-data-md text-on-surface-variant lg:inline">
-          {handoff.persona}
+        <span className="hidden flex-col items-end lg:flex">
+          <span className="font-body-md text-body-md leading-tight text-ink">
+            {handoff.clientName}
+          </span>
+          <span className="font-data-md text-[11px] leading-tight text-on-surface-variant">
+            {handoff.persona}
+          </span>
         </span>
         <span className="inline-flex items-center rounded bg-primary px-2 py-1 font-label-caps text-[10px] uppercase tracking-widest text-on-primary">
           {handoff.pursueDecision}

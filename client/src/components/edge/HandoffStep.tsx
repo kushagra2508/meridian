@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react'
 import reference from '../../edge/data/reference.json'
+import { listPersonas } from '../../edge/fromPersona'
+import { CURRENT_RM, greeting } from '../../edge/rm'
 import { useEdgeDispatch, useEdgeState } from '../../edge/store'
 
 const RECEIVED_ON = new Date(reference.generated_at)
@@ -7,18 +9,53 @@ const RECEIVED_ON = new Date(reference.generated_at)
   .toUpperCase()
 
 export function HandoffStep() {
-  const { handoff } = useEdgeState()
+  const { handoff, personaId } = useEdgeState()
   const dispatch = useEdgeDispatch()
+  const leads = listPersonas()
+  const queued = leads.filter((lead) => lead.id !== personaId)
 
   return (
     <article className="flex w-full flex-col border border-rule bg-background">
-      <header className="flex items-center border-b border-rule bg-surface-container-low px-stack-dense py-stack-compact">
+      <header className="flex flex-wrap items-center justify-between gap-2 border-b border-rule bg-surface-container-low px-stack-dense py-stack-compact">
         <h1 className="m-0 font-data-md text-[11px] uppercase tracking-wider text-on-surface-variant">
           Received from acquisition engine · {RECEIVED_ON}
         </h1>
+        <p className="m-0 font-data-md text-[11px] uppercase tracking-wider text-on-surface-variant">
+          {greeting()}, {CURRENT_RM.name} · {CURRENT_RM.desk}
+        </p>
       </header>
 
       <div className="flex flex-col p-margin-page">
+        <div className="mb-stack-loose flex flex-wrap items-baseline justify-between gap-2 border-b border-rule pb-stack-compact">
+          <div>
+            <p className="m-0 font-label-caps text-label-caps uppercase text-on-surface-variant">
+              Lead
+            </p>
+            <h2 className="mt-1 font-headline-md text-headline-md text-primary">
+              {handoff.clientName}
+            </h2>
+          </div>
+          {queued.length > 0 ? (
+            <div className="flex flex-col items-end gap-1">
+              <p className="m-0 font-label-caps text-[10px] uppercase tracking-wider text-on-surface-variant">
+                {queued.length} more in queue
+              </p>
+              <div className="flex flex-wrap justify-end gap-1.5">
+                {queued.map((lead) => (
+                  <button
+                    key={lead.id}
+                    type="button"
+                    onClick={() => dispatch({ type: 'LOAD_PERSONA', id: lead.id })}
+                    className="rounded border border-rule bg-surface px-2.5 py-1 font-label-caps text-[10px] uppercase tracking-wider text-on-surface-variant transition-colors hover:border-primary hover:text-primary"
+                  >
+                    {lead.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+        </div>
+
         <dl className="mb-stack-dense grid grid-cols-1 gap-x-stack-dense gap-y-stack-dense sm:grid-cols-[200px_1fr]">
           <Row label="Persona">{handoff.persona}</Row>
           <Row label="Priority tier">{handoff.priorityTier}</Row>
