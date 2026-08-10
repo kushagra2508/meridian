@@ -26,3 +26,23 @@ export function runDrag(position: Position): DragResult {
     scopeNote: reference.ter_spread.scope_note,
   }
 }
+
+/**
+ * TER drag avoided on a fresh annual contribution (e.g. a Rethink top-up SIP)
+ * if it is routed Direct instead of following the book's current distributor
+ * share. Mirrors runDrag's rate, scaled to the new money and split across the
+ * MF sleeves in the same proportion the existing book already holds them.
+ */
+export function dragSavedOnNewFlow(position: Position, annualAmount: number): number {
+  if (annualAmount <= 0) return 0
+  const { alloc, channel } = position
+  const mfWeight = alloc.equity_mf + alloc.debt_mf
+  if (mfWeight <= 0) return 0
+
+  const equityShare = alloc.equity_mf / mfWeight
+  const debtShare = alloc.debt_mf / mfWeight
+  const blendedTerSpread =
+    equityShare * reference.ter_spread.equity_mf + debtShare * reference.ter_spread.debt_mf
+
+  return annualAmount * channel.distributor * blendedTerSpread
+}

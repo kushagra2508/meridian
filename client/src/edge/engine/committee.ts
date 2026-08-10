@@ -6,7 +6,7 @@ import type {
   Handoff,
   Position,
 } from '../types'
-import { runDrag } from './drag'
+import { dragSavedOnNewFlow, runDrag } from './drag'
 import { runEligibility } from './eligibility'
 import { buildVerdict, rankPaths } from './ledger'
 import { runProjection } from './projection'
@@ -200,30 +200,43 @@ export function runCommittee(
           notes: [],
         },
       ]
-    : runReframe(position, goal).options.map((opt) => ({
-        path: opt.id,
-        label: opt.label,
-        netRupees:
+    : runReframe(position, goal).options.map((opt) => {
+        // Slip/shrink leave the book untouched, so tax and drag are genuinely
+        // ₹0 (tagged below). Top-up is the one option that moves new money —
+        // if that SIP goes Direct instead of following the book's current
+        // distributor share, it avoids real, computable TER drag each year.
+        const annualDragSaved =
+          opt.id === 'monthly_topup' ? dragSavedOnNewFlow(position, opt.monthly * 12) : 0
+        const netRupees =
           opt.id === 'monthly_topup'
-            ? -opt.monthly * 12 * projection.n
-            : opt.reachable - goal.amount,
-        taxCost: 0,
-        annualDragSaved: 0,
-        goalProb:
-          opt.id === 'shrink_target'
-            ? 0.9
-            : opt.id === 'slip_year'
-              ? 0.85
-              : 0.8,
-        illiquidPct,
-        tags: opt.noPortfolioChange ? ['NO PORTFOLIO CHANGE REQUIRED'] : [],
-        notes:
-          opt.id === 'shrink_target'
-            ? [`Reachable by ${goal.year}: ₹${Math.round(opt.reachable)}`]
-            : opt.id === 'slip_year'
-              ? [`Slip ${opt.slipMonths} months`]
-              : [`Monthly top-up ₹${Math.round(opt.monthly)}`],
-      }))
+            ? (annualDragSaved - opt.monthly * 12) * projection.n
+            : opt.reachable - goal.amount
+
+        return {
+          path: opt.id,
+          label: opt.label,
+          netRupees,
+          taxCost: 0,
+          annualDragSaved,
+          goalProb:
+            opt.id === 'shrink_target'
+              ? 0.9
+              : opt.id === 'slip_year'
+                ? 0.85
+                : 0.8,
+          illiquidPct,
+          tags: opt.noPortfolioChange ? ['NO PORTFOLIO CHANGE REQUIRED'] : [],
+          notes:
+            opt.id === 'shrink_target'
+              ? [`Reachable by ${goal.year}: ₹${Math.round(opt.reachable)}`]
+              : opt.id === 'slip_year'
+                ? [`Slip ${opt.slipMonths} months`]
+                : [
+                    `Monthly top-up ₹${Math.round(opt.monthly)}`,
+                    `Direct-routed SIP saves ₹${Math.round(annualDragSaved)}/yr in TER drag`,
+                  ],
+        }
+      })
 
   const ledger = rankPaths(pathDrafts)
   const verdict = buildVerdict(
