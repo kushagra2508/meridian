@@ -36,6 +36,27 @@ export function normalizeAlloc(alloc: Alloc): Alloc {
   return next
 }
 
+/**
+ * Move one sled in a fixed budget: `key` takes `value`, and the other classes
+ * absorb the difference in proportion to how much they already hold, so the six
+ * weights always sum to exactly 1 and no drag can push the book past 100%.
+ * When the others are all empty there is no proportion to preserve, so the
+ * remainder is spread evenly instead.
+ */
+export function setAllocBudgeted(alloc: Alloc, key: AssetKey, value: number): Alloc {
+  const target = Math.min(1, Math.max(0, value))
+  const others = ASSET_KEYS.filter((k) => k !== key)
+  const othersSum = others.reduce((acc, k) => acc + (alloc[k] ?? 0), 0)
+  const remainder = 1 - target
+
+  const next = { ...alloc, [key]: target } as Alloc
+  for (const k of others) {
+    next[k] =
+      othersSum > 0 ? ((alloc[k] ?? 0) / othersSum) * remainder : remainder / others.length
+  }
+  return next
+}
+
 export function blendedReturn(alloc: Alloc): number {
   const a = normalizeAlloc(alloc)
   return ASSET_KEYS.reduce((acc, key) => {

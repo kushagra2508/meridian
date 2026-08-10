@@ -1,4 +1,4 @@
-# STATUTE — engineering handoff
+# EDGE — engineering handoff
 
 Build target: working demo on a laptop, 9 Aug 2026. Live judge interaction, 7-minute demo.
 Non-negotiable: **no number in the UI may originate from an LLM.**
@@ -14,7 +14,7 @@ until you know what they are defending against.
 
 Meridian is a boutique Indian wealth manager entering the emerging-affluent segment
 (₹50L–₹2Cr investable). A separate acquisition engine decides which leads are worth
-spending money on, using declared data from an intake form. STATUTE picks up **after**
+spending money on, using declared data from an intake form. EDGE picks up **after**
 that spend, once the client's actual holdings are visible, and answers a different
 question: given what this person really owns, is their stated financial goal reachable,
 and what does reaching it cost after tax and distributor drag?
@@ -60,23 +60,23 @@ Each earns its seat by having a distinct objective that can genuinely lose an ar
 
 | Agent | Objective | Fights with | Why it exists |
 |---|---|---|---|
-| Feasibility | Close the gap without breaking the deadline | everyone | Proposes; without it nothing to argue about |
-| Statute | Minimise realised tax on the proposal | Feasibility | Tax is the only cost a wealth manager can price with certainty |
-| Channel | Eliminate ongoing distributor drag | Statute | Carries the firm's core commercial thesis, that distribution margin is the client's loss |
-| Reframe | Make the goal reachable | Feasibility | Moves the goal instead of the money when nothing else works |
+| Planner | Close the gap without breaking the deadline | everyone | Proposes; without it nothing to argue about |
+| Tax | Minimise realised tax on the proposal | Planner | Tax is the only cost a wealth manager can price with certainty |
+| Channel | Eliminate ongoing distributor drag | Tax | Carries the firm's core commercial thesis, that distribution margin is the client's loss |
+| Rethink | Make the goal reachable | Planner | Moves the goal instead of the money when nothing else works |
 
-The sharpest conflict is Statute versus Channel: escaping drag requires exiting, and
+The sharpest conflict is Tax versus Channel: escaping drag requires exiting, and
 exiting realises gains. **Both agents are correct simultaneously.** That is the moment the
 demo is built around, so do not smooth it over in the ledger or the verdict.
 
 A fifth agent (Liquidity) was cut because at allocation level it had nothing to say on most
 inputs, and an agent that reports "no concerns" makes the whole committee look decorative.
-Its one real job, horizon versus lock-in, folded into Feasibility as a constraint the agent
+Its one real job, horizon versus lock-in, folded into Planner as a constraint the agent
 announces aloud.
 
 An Economics agent that refused unprofitable clients was also cut. The upstream acquisition
 engine already qualifies leads before spend, so refusing them post-conversion saves nothing
-and duplicates another system's logic. Reframe replaced it.
+and duplicates another system's logic. Rethink replaced it.
 
 ### 0.5 The flow, and what each screen is for
 
@@ -93,7 +93,7 @@ S7 Reshuffle   → any lever re-runs the whole thing     ← the interactivity p
 Two screens exist for reasons that are not obvious from their content:
 
 **S1 exists to set up a disagreement.** The acquisition engine ranked this lead on declared
-income. STATUTE will often reach a different conclusion from observed position. That gap is
+income. EDGE will often reach a different conclusion from observed position. That gap is
 the point, not a bug, and S1 plants it so S5 can pay it off.
 
 **S4 exists to prove regulation drives segmentation before any AI runs.** It is the first
@@ -154,10 +154,10 @@ src/
   data/personas.json
   data/cachedProse.json      ← LLM fallback, one entry per agent per scenario
   engine/
-    projection.ts            Feasibility maths
-    tax.ts                   Statute rules
+    projection.ts            Planner maths
+    tax.ts                   Tax rules
     drag.ts                  Channel maths
-    reframe.ts               Reframe maths
+    reframe.ts               Rethink maths
     eligibility.ts           SEBI ladder
     committee.ts             orchestrator, returns AgentPosition[]
     ledger.ts
@@ -258,10 +258,10 @@ requiredReturn= (goal.amount / totalWealth)^(1/n) - 1
 
 Reallocation search: shift from `fd_cash` → `equity_mf` in ₹1L steps until `projected ≥ goal.amount`.
 Hard cap total equity exposure (equity_mf + direct_equity) at 0.85. If capped and still short,
-`feasible = false` and Reframe fires.
+`feasible = false` and Rethink fires.
 
 Horizon filter: if `n < reference.aif_lockin_years` and wealth ≥ AIF minimum, mark AIF
-`ruledOut` with reason. Feasibility must state this aloud even though it is a non-event.
+`ruledOut` with reason. Planner must state this aloud even though it is a non-event.
 
 ### 5.2 tax.ts — four rules only
 
@@ -338,15 +338,15 @@ function runCommittee(position, goal, handoff): { positions: AgentPosition[]; le
 Fixed sequence with one conditional branch. Not a graph.
 
 ```
-1. Feasibility  → PROPOSES | CONDITIONS
-2. Statute      → OBJECTS if taxCost > 0.02 × totalWealth, else CONDITIONS
+1. Planner  → PROPOSES | CONDITIONS
+2. Tax      → OBJECTS if taxCost > 0.02 × totalWealth, else CONDITIONS
 3. Channel      → OBJECTS if annualDrag > 0, else CONCEDES
-4. Reframe      → only if feasible === false
+4. Rethink      → only if feasible === false
 ```
 
 ```ts
 type AgentPosition = {
-  agent: 'feasibility'|'statute'|'channel'|'reframe';
+  agent: 'planner'|'statute'|'channel'|'rethink';
   stance: 'PROPOSES'|'OBJECTS'|'CONDITIONS'|'CONCEDES';
   figures: { key:string; value:number; badge:{ tier:'live'|'statute'|'assumption'; label:string } }[];
   referencesAgent: string | null;   // drives the ochre connector
@@ -431,12 +431,12 @@ honesty**. Let them run. Only genuinely invalid states are blocked.
 | Input | Required behaviour |
 |---|---|
 | `goal.year <= 2026` | Block at S3, inline message, no crash |
-| Real estate 100% | Blended return 0, gap enormous, Reframe leads. Correct, let it run |
+| Real estate 100% | Blended return 0, gap enormous, Rethink leads. Correct, let it run |
 | Direct equity 90%, MF 0% | Channel returns drag ₹0 and says so |
 | Wealth ₹10L | Ladder fully greyed, all paths still compute |
-| Goal already met | Feasibility CONCEDES, Statute ₹0, verdict shows "no change required" |
+| Goal already met | Planner CONCEDES, Tax ₹0, verdict shows "no change required" |
 | Allocation sums to 99% | Normalise silently on blur |
-| Gain below ₹1.25L | Statute returns ₹0 and cites the exemption. Never negative |
+| Gain below ₹1.25L | Tax returns ₹0 and cites the exemption. Never negative |
 
 ---
 

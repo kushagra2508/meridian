@@ -1,4 +1,4 @@
-"""The Feasibility agent: its brief, its instructions, and its answer shape."""
+"""The Planner agent: its brief, its instructions, and its answer shape."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from .config import llm_model
 from .tools import feasibility_tools
 from .tools.common import coerce_allocation_to_mapping, validate_allocation
 
-ROLE = "Goal Feasibility Analyst"
+ROLE = "Goal Planner Analyst"
 
 GOAL = (
     "Decide whether a client's stated goal is reachable on their current plan, "

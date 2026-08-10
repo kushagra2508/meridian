@@ -40,7 +40,7 @@ const script: ScriptStep[] = [
       type: 'status',
       id: randomUUID(),
       state: 'thinking',
-      label: 'Running Feasibility → Statute → Channel → Reframe → Shared',
+      label: 'Running Planner → Tax → Fees → Rethink → Verdict',
     }),
   },
   {
@@ -51,7 +51,7 @@ const script: ScriptStep[] = [
       at: clockLabel(),
       source: 'System',
       message: 'Stage 1/5:',
-      highlight: 'Feasibility',
+      highlight: 'Planner',
     }),
   },
   {
@@ -60,7 +60,7 @@ const script: ScriptStep[] = [
       type: 'log',
       id: randomUUID(),
       at: clockLabel(),
-      source: 'Feasibility',
+      source: 'Planner',
       message: `Interpreting directive: "${prompt}"`,
     }),
   },
@@ -112,10 +112,10 @@ const script: ScriptStep[] = [
       type: 'message',
       id: randomUUID(),
       at: clockLabel(),
-      source: 'Feasibility',
+      source: 'Planner',
       text: 'Short by INR 601,298; a 29 point shift into mid-cap equity closes it.',
       report: {
-        agent: 'Feasibility',
+        agent: 'Planner',
         title: 'Goal feasibility',
         headline: 'Short by INR 601,298; a 29 point shift into mid-cap equity closes it.',
         verdict: 'reachable_with_changes',
@@ -135,7 +135,7 @@ const script: ScriptStep[] = [
       type: 'status',
       id: randomUUID(),
       state: 'thinking',
-      label: 'Statute pricing the switch',
+      label: 'Tax pricing the switch',
     }),
   },
   {
@@ -146,7 +146,7 @@ const script: ScriptStep[] = [
       at: clockLabel(),
       source: 'System',
       message: 'Stage 2/5:',
-      highlight: 'Statute',
+      highlight: 'Tax',
     }),
   },
   {
@@ -197,10 +197,10 @@ const script: ScriptStep[] = [
       type: 'message',
       id: randomUUID(),
       at: clockLabel(),
-      source: 'Statute',
+      source: 'Tax',
       text: 'The switch costs about INR 19,500 including surcharge and cess; staging across FYs saves little here.',
       report: {
-        agent: 'Statute',
+        agent: 'Tax',
         title: 'Switch tax cost',
         headline:
           'The switch costs about INR 19,500 including surcharge and cess; staging across FYs saves little here.',
@@ -220,7 +220,7 @@ const script: ScriptStep[] = [
       type: 'status',
       id: randomUUID(),
       state: 'thinking',
-      label: 'Channel measuring TER drag',
+      label: 'Fees measuring TER drag',
     }),
   },
   {
@@ -231,7 +231,7 @@ const script: ScriptStep[] = [
       at: clockLabel(),
       source: 'System',
       message: 'Stage 3/5:',
-      highlight: 'Channel',
+      highlight: 'Fees',
     }),
   },
   {
@@ -282,10 +282,10 @@ const script: ScriptStep[] = [
       type: 'message',
       id: randomUUID(),
       at: clockLabel(),
-      source: 'Channel',
+      source: 'Fees',
       text: 'Staying on Regular plans costs about INR 7,740 a year on this book.',
       report: {
-        agent: 'Channel',
+        agent: 'Fees',
         title: 'Regular vs Direct drag',
         headline: 'Staying on Regular plans costs about INR 7,740 a year on this book.',
         verdict: 'drag',
@@ -304,7 +304,7 @@ const script: ScriptStep[] = [
       type: 'status',
       id: randomUUID(),
       state: 'thinking',
-      label: 'Reframe solving the three levers',
+      label: 'Rethink solving the three levers',
     }),
   },
   {
@@ -315,7 +315,7 @@ const script: ScriptStep[] = [
       at: clockLabel(),
       source: 'System',
       message: 'Stage 4/5:',
-      highlight: 'Reframe',
+      highlight: 'Rethink',
     }),
   },
   {
@@ -399,7 +399,7 @@ const script: ScriptStep[] = [
       id: randomUUID(),
       ref: 'tool-price',
       status: 'ok',
-      summary: 'Lowest friction: shrink_target after Statute + Channel reprice',
+      summary: 'Lowest friction: shrink_target after Tax + Fees reprice',
     }),
   },
   {
@@ -408,10 +408,10 @@ const script: ScriptStep[] = [
       type: 'message',
       id: randomUUID(),
       at: clockLabel(),
-      source: 'Reframe',
+      source: 'Rethink',
       text: 'Three levers are open; shrinking to INR 4.4L keeps the date with the least all-in friction.',
       report: {
-        agent: 'Reframe',
+        agent: 'Rethink',
         title: 'Reframed levers',
         headline:
           'Three levers are open; shrinking to INR 4.4L keeps the date with the least all-in friction.',
@@ -436,7 +436,7 @@ const script: ScriptStep[] = [
       type: 'status',
       id: randomUUID(),
       state: 'thinking',
-      label: 'Shared closing the desk',
+      label: 'Verdict closing the desk',
     }),
   },
   {
@@ -447,7 +447,7 @@ const script: ScriptStep[] = [
       at: clockLabel(),
       source: 'System',
       message: 'Stage 5/5:',
-      highlight: 'Shared',
+      highlight: 'Verdict',
     }),
   },
   {
@@ -519,10 +519,10 @@ const script: ScriptStep[] = [
       type: 'message',
       id: randomUUID(),
       at: clockLabel(),
-      source: 'Shared',
+      source: 'Verdict',
       text: 'Lead with shrink_target; corpus stays in the mutual-fund lane.',
       report: {
-        agent: 'Shared',
+        agent: 'Verdict',
         title: 'Desk close',
         headline: 'Lead with shrink_target; corpus stays in the mutual-fund lane.',
         verdict: 'shrink_target',
@@ -548,7 +548,7 @@ const script: ScriptStep[] = [
         id: randomUUID(),
         at: clockLabel(),
         summary:
-          'Pipeline complete - Feasibility: ok; Statute: ok; Channel: ok; Reframe: ok; Shared: ok',
+          'Pipeline complete - Planner: ok; Tax: ok; Fees: ok; Rethink: ok; Verdict: ok',
       },
     ],
   },

@@ -1,4 +1,4 @@
-"""The Reframe agent: three levers when the original plan misses the target."""
+"""The Rethink agent: three levers when the original plan misses the target."""
 
 from __future__ import annotations
 
@@ -13,20 +13,20 @@ from .tools import reframe_tools
 from .tools.common import coerce_allocation_to_mapping, validate_allocation
 from .tools.drag_calc import HoldingLine, coerce_holdings
 
-ROLE = "Goal Reframe Analyst"
+ROLE = "Goal Rethink Analyst"
 
 GOAL = (
     "When the original target and date do not clear, quantify the three honest "
     "levers -- slip the year, shrink the target, or top up the monthly -- and "
-    "price each path through Statute and Channel before recommending one."
+    "price each path through Tax and Fees before recommending one."
 )
 
 BACKSTORY = (
-    "You sit after Feasibility has named a shortfall. Clients hate being told "
+    "You sit after Planner has named a shortfall. Clients hate being told "
     "'try harder' without numbers, so you never paraphrase a lever: you solve "
     "it. Slip the date with nper. Shrink the target with fv. Top up the SIP "
     "with pmt. Then you hand each option back through the same tax and TER "
-    "stack Statute and Channel already ran, because a cheaper-looking SIP that "
+    "stack Tax and Fees already ran, because a cheaper-looking SIP that "
     "ignores friction is a fiction.\n\n"
     "You work in a fixed order. Solve the three levers. Price them. Prefer the "
     "path whose all-in friction the client can actually live with. You never "
@@ -37,7 +37,7 @@ PreferredLever = Literal["slip_year", "shrink_target", "monthly_topup", "none"]
 
 
 class ReframeBrief(BaseModel):
-    """Plan inputs plus upstream context the Reframe agent needs."""
+    """Plan inputs plus upstream context the Rethink agent needs."""
 
     goal: str
     target_amount: float = Field(gt=0)
@@ -100,7 +100,7 @@ class ReframeBrief(BaseModel):
             f"Original years: {self.years_to_goal:g}",
             f"Invested today: {self.currency} {self.current_corpus:,.0f}",
             f"Monthly contribution: {self.currency} {self.monthly_contribution:,.0f}",
-            f"Portfolio value for Channel: {self.currency} {self.portfolio_value:,.0f}",
+            f"Portfolio value for Fees: {self.currency} {self.portfolio_value:,.0f}",
             "Allocation to pass verbatim:\n" + self.allocation_argument(),
             "Holdings to pass verbatim:\n" + self.holdings_argument(),
             "Disposals to pass verbatim into price_options:\n"
@@ -109,14 +109,14 @@ class ReframeBrief(BaseModel):
             f"regime: {self.regime}; age_band: {self.age_band}",
         ]
         if self.shortfall is not None:
-            lines.append(f"Feasibility shortfall: {self.currency} {self.shortfall:,.0f}")
+            lines.append(f"Planner shortfall: {self.currency} {self.shortfall:,.0f}")
         if self.feasibility_verdict:
-            lines.append(f"Feasibility verdict: {self.feasibility_verdict}")
+            lines.append(f"Planner verdict: {self.feasibility_verdict}")
         if self.statute_tax is not None:
-            lines.append(f"Upstream Statute tax: {self.currency} {self.statute_tax:,.0f}")
+            lines.append(f"Upstream Tax tax: {self.currency} {self.statute_tax:,.0f}")
         if self.channel_annual_drag is not None:
             lines.append(
-                f"Upstream Channel annual drag: {self.currency} "
+                f"Upstream Fees annual drag: {self.currency} "
                 f"{self.channel_annual_drag:,.0f}"
             )
         if self.notes:
@@ -174,7 +174,7 @@ Work in this order and use the tools for every number:
    Read all_in_friction per option. If price_options errors, fix the arguments
    from the brief and retry once; do not invent new holdings.
 
-If Feasibility already said on_track and every lever comes back zero, set
+If Planner already said on_track and every lever comes back zero, set
 preferred_lever to `none` and say the plan needs no reframe.
 
 Rules:

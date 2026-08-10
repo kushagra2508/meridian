@@ -1,22 +1,23 @@
-import { CommitteeStep } from './components/statute/CommitteeStep'
-import { EligibilityStep } from './components/statute/EligibilityStep'
-import { GoalStep } from './components/statute/GoalStep'
-import { HandoffStep } from './components/statute/HandoffStep'
-import { PositionStep } from './components/statute/PositionStep'
-import { StatuteChrome } from './components/statute/StatuteChrome'
-import { VerdictStep } from './components/statute/VerdictStep'
-import { hasChrome } from './statute/flow'
-import { StatuteProvider, useStatuteState } from './statute/store'
-import type { StatuteScreen } from './statute/types'
+import { CommitteeStep } from './components/edge/CommitteeStep'
+import { EdgeChrome } from './components/edge/EdgeChrome'
+import { EligibilityStep } from './components/edge/EligibilityStep'
+import { GlossaryStep } from './components/edge/GlossaryStep'
+import { GoalStep } from './components/edge/GoalStep'
+import { HandoffStep } from './components/edge/HandoffStep'
+import { PositionStep } from './components/edge/PositionStep'
+import { VerdictStep } from './components/edge/VerdictStep'
+import { hasChrome } from './edge/flow'
+import { EdgeProvider, useEdgeState } from './edge/store'
+import type { EdgeScreen } from './edge/types'
 
 /** Transactional screens sit alone on the page at their own document width. */
-const BARE_WIDTH: Partial<Record<StatuteScreen, string>> = {
+const BARE_WIDTH: Partial<Record<EdgeScreen, string>> = {
   handoff: 'max-w-[780px]',
   goal: 'max-w-[720px]',
   eligibility: 'max-w-[1440px]',
 }
 
-function CurrentScreen({ screen }: { screen: StatuteScreen }) {
+function CurrentScreen({ screen }: { screen: EdgeScreen }) {
   switch (screen) {
     case 'handoff':
       return <HandoffStep />
@@ -30,17 +31,19 @@ function CurrentScreen({ screen }: { screen: StatuteScreen }) {
       return <CommitteeStep />
     case 'verdict':
       return <VerdictStep />
+    case 'glossary':
+      return <GlossaryStep />
     default:
       return null
   }
 }
 
-function StatuteFlow() {
-  const { screen } = useStatuteState()
+function EdgeFlow() {
+  const { screen } = useEdgeState()
   const body = <CurrentScreen screen={screen} />
 
   if (hasChrome(screen)) {
-    return <StatuteChrome>{body}</StatuteChrome>
+    return <EdgeChrome>{body}</EdgeChrome>
   }
 
   return (
@@ -52,8 +55,8 @@ function StatuteFlow() {
 
 export default function App() {
   return (
-    <StatuteProvider>
-      <StatuteFlow />
-    </StatuteProvider>
+    <EdgeProvider>
+      <EdgeFlow />
+    </EdgeProvider>
   )
 }

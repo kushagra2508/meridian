@@ -1,0 +1,170 @@
+{
+  "defaultPersonaId": "P2",
+  "personas": [
+    {
+      "id": "P1",
+      "label": "Aspiring High Roller",
+      "round1": {
+        "age": 34,
+        "salary": 37500000,
+        "equityAllocationPct": 85,
+        "depositAllocationPct": 5
+      },
+      "handoff": {
+        "persona": "P1 · Aspiring High Roller",
+        "priorityTier": 1,
+        "declaredIncomeBand": "1Cr-2Cr",
+        "declaredIncomeLabel": "₹3,00,00,000 – ₹5,00,00,000",
+        "channelUsed": "LinkedIn campaign",
+        "pursueDecision": "PURSUE",
+        "futureEvents": [
+          { "label": "Series B liquidity (2027)", "year": 2027 }
+        ],
+        "acquisitionCost": 22000
+      },
+      "typicalPosition": {
+        "totalWealth": 206250000,
+        "alloc": {
+          "equity_mf": 0.55,
+          "debt_mf": 0.03,
+          "fd_cash": 0.02,
+          "direct_equity": 0.3,
+          "gold": 0.05,
+          "real_estate": 0.05
+        },
+        "channel": { "direct": 0.7, "distributor": 0.3 },
+        "unrealisedGainPct": 0.3
+      },
+      "typicalGoal": {
+        "amount": 800000000,
+        "year": 2032,
+        "purpose": "legacy",
+        "note": "Aggressive growth mandate; low patience for advisory friction."
+      }
+    },
+    {
+      "id": "P2",
+      "label": "Smart Risk Taker",
+      "round1": {
+        "age": 42,
+        "salary": 22500000,
+        "equityAllocationPct": 65,
+        "depositAllocationPct": 15
+      },
+      "handoff": {
+        "persona": "P2 · Smart Risk Taker",
+        "priorityTier": 1,
+        "declaredIncomeBand": "50L-1Cr",
+        "declaredIncomeLabel": "₹70,00,000 – ₹1,00,00,000",
+        "channelUsed": "WhatsApp campaign",
+        "pursueDecision": "PURSUE",
+        "futureEvents": [
+          { "label": "ESOP buyback (Mar 2026)", "year": 2026 },
+          { "label": "Marriage (2028)", "year": 2028 }
+        ],
+        "acquisitionCost": 18500
+      },
+      "typicalPosition": {
+        "totalWealth": 124500000,
+        "alloc": {
+          "equity_mf": 0.35,
+          "debt_mf": 0.2,
+          "fd_cash": 0.15,
+          "direct_equity": 0.1,
+          "gold": 0.05,
+          "real_estate": 0.15
+        },
+        "channel": { "direct": 0.4, "distributor": 0.6 },
+        "unrealisedGainPct": 0.25
+      },
+      "typicalGoal": {
+        "amount": 500000000,
+        "year": 2033,
+        "purpose": "retirement",
+        "note": "Corpus target sized so observed position must reallocate or reframe."
+      }
+    },
+    {
+      "id": "P3",
+      "label": "Steady Wealth Builder",
+      "round1": {
+        "age": 51,
+        "salary": 15000000,
+        "equityAllocationPct": 45,
+        "depositAllocationPct": 25
+      },
+      "handoff": {
+        "persona": "P3 · Steady Wealth Builder",
+        "priorityTier": 2,
+        "declaredIncomeBand": "50L-1Cr",
+        "declaredIncomeLabel": "₹1,00,00,000 – ₹2,00,00,000",
+        "channelUsed": "Advisor referral",
+        "pursueDecision": "PURSUE",
+        "futureEvents": [
+          { "label": "Child education (2029)", "year": 2029 }
+        ],
+        "acquisitionCost": 12000
+      },
+      "typicalPosition": {
+        "totalWealth": 82500000,
+        "alloc": {
+          "equity_mf": 0.3,
+          "debt_mf": 0.15,
+          "fd_cash": 0.1,
+          "direct_equity": 0.15,
+          "gold": 0.1,
+          "real_estate": 0.2
+        },
+        "channel": { "direct": 0.35, "distributor": 0.65 },
+        "unrealisedGainPct": 0.2
+      },
+      "typicalGoal": {
+        "amount": 250000000,
+        "year": 2034,
+        "purpose": "education",
+        "note": "Goal-anchored accumulation with a standing advisor relationship."
+      }
+    },
+    {
+      "id": "P4",
+      "label": "Disciplined Saver",
+      "round1": {
+        "age": 60,
+        "salary": 9500000,
+        "equityAllocationPct": 25,
+        "depositAllocationPct": 45
+      },
+      "handoff": {
+        "persona": "P4 · Disciplined Saver",
+        "priorityTier": 3,
+        "declaredIncomeBand": "<50L",
+        "declaredIncomeLabel": "₹50,00,000 – ₹1,00,00,000",
+        "channelUsed": "Branch walk-in",
+        "pursueDecision": "DEFER",
+        "futureEvents": [
+          { "label": "Retirement (2028)", "year": 2028 }
+        ],
+        "acquisitionCost": 8000
+      },
+      "typicalPosition": {
+        "totalWealth": 52250000,
+        "alloc": {
+          "equity_mf": 0.15,
+          "debt_mf": 0.2,
+          "fd_cash": 0.25,
+          "direct_equity": 0.1,
+          "gold": 0.1,
+          "real_estate": 0.2
+        },
+        "channel": { "direct": 0.25, "distributor": 0.75 },
+        "unrealisedGainPct": 0.15
+      },
+      "typicalGoal": {
+        "amount": 90000000,
+        "year": 2030,
+        "purpose": "retirement",
+        "note": "Capital preservation first; converts slowly to invested products."
+      }
+    }
+  ]
+}

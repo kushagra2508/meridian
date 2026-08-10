@@ -44,7 +44,7 @@ from .statute_agent import (
 )
 from .trace import ToolCall, tool_trace
 
-AgentName = Literal["Feasibility", "Statute", "Channel", "Reframe", "Shared"]
+AgentName = Literal["Planner", "Tax", "Fees", "Rethink", "Verdict"]
 
 
 class MissingCredentialsError(RuntimeError):
@@ -65,7 +65,7 @@ class AgentRun:
     )
     raw: str
     model: str
-    agent: AgentName = "Feasibility"
+    agent: AgentName = "Planner"
     tool_calls: list[ToolCall] = field(default_factory=list)
     usage: dict[str, Any] = field(default_factory=dict)
 
@@ -84,7 +84,7 @@ FeasibilityRun = AgentRun
 
 @dataclass
 class PipelineRun:
-    """Feasibility → Statute → Channel → Reframe → Shared."""
+    """Planner → Tax → Fees → Rethink → Verdict."""
 
     feasibility: AgentRun
     statute: AgentRun | None = None
@@ -246,7 +246,7 @@ def run_feasibility(
     resolved = model or llm_model()
     return _kickoff(
         build_feasibility_crew(brief, model=resolved, verbose=verbose),
-        agent="Feasibility",
+        agent="Planner",
         model=resolved,
         verdict_type=FeasibilityVerdict,
         trace=trace,
@@ -265,7 +265,7 @@ def run_statute(
     resolved = model or llm_model()
     return _kickoff(
         build_statute_crew(brief, model=resolved, verbose=verbose),
-        agent="Statute",
+        agent="Tax",
         model=resolved,
         verdict_type=StatuteVerdict,
         trace=trace,
@@ -284,7 +284,7 @@ def run_channel(
     resolved = model or llm_model()
     return _kickoff(
         build_channel_crew(brief, model=resolved, verbose=verbose),
-        agent="Channel",
+        agent="Fees",
         model=resolved,
         verdict_type=ChannelVerdict,
         trace=trace,
@@ -303,7 +303,7 @@ def run_reframe(
     resolved = model or llm_model()
     return _kickoff(
         build_reframe_crew(brief, model=resolved, verbose=verbose),
-        agent="Reframe",
+        agent="Rethink",
         model=resolved,
         verdict_type=ReframeVerdict,
         trace=trace,
@@ -322,7 +322,7 @@ def run_shared(
     resolved = model or llm_model()
     return _kickoff(
         build_shared_crew(brief, model=resolved, verbose=verbose),
-        agent="Shared",
+        agent="Verdict",
         model=resolved,
         verdict_type=SharedVerdict,
         trace=trace,
@@ -337,7 +337,7 @@ def default_switch_brief(
     regime: str = "new",
     age_band: str = "below_60",
 ) -> SwitchBrief:
-    """Build the Statute brief from the goal and Feasibility's recommended moves."""
+    """Build the Tax brief from the goal and Planner's recommended moves."""
     moves = list(feasibility.recommended_moves) if feasibility else []
     disposals = disposals_from_moves(moves, goal.current_corpus)
     purpose = (
@@ -348,12 +348,12 @@ def default_switch_brief(
     notes = None
     if feasibility and not moves:
         notes = (
-            f"Feasibility verdict was '{feasibility.verdict}' with no recommended "
+            f"Planner verdict was '{feasibility.verdict}' with no recommended "
             "moves. Price an empty switch (tax should be zero)."
         )
     elif feasibility:
         notes = (
-            f"Feasibility verdict: {feasibility.verdict}. "
+            f"Planner verdict: {feasibility.verdict}. "
             f"Headline: {feasibility.headline}"
         )
     return SwitchBrief(
@@ -372,7 +372,7 @@ def default_channel_brief(
     plan: Literal["regular", "direct"] = "regular",
     extra_holdings: list[dict[str, Any]] | None = None,
 ) -> ChannelBrief:
-    """Channel brief from the goal allocation; demo defaults to Regular plans."""
+    """Fees brief from the goal allocation; demo defaults to Regular plans."""
     value = goal.current_corpus if goal.current_corpus > 0 else 1.0
     return ChannelBrief(
         portfolio_value=value,
@@ -381,7 +381,7 @@ def default_channel_brief(
         ),
         currency=goal.currency,
         notes=(
-            f"Holdings inferred from the Feasibility allocation for '{goal.goal}'. "
+            f"Holdings inferred from the Planner allocation for '{goal.goal}'. "
             f"Plan type assumed: {plan}."
         ),
     )
@@ -398,20 +398,20 @@ def default_reframe_brief(
     age_band: str = "below_60",
     channel_plan: Literal["regular", "direct"] = "regular",
 ) -> ReframeBrief:
-    """Reframe brief from the goal plus Feasibility / Statute / Channel outputs."""
+    """Rethink brief from the goal plus Planner / Tax / Fees outputs."""
     moves = list(feasibility.recommended_moves) if feasibility else []
     disposals = disposals_from_moves(moves, goal.current_corpus)
     value = goal.current_corpus if goal.current_corpus > 0 else 1.0
     notes_parts = []
     if feasibility:
         notes_parts.append(
-            f"Feasibility: {feasibility.verdict} — {feasibility.headline}"
+            f"Planner: {feasibility.verdict} — {feasibility.headline}"
         )
     if statute:
-        notes_parts.append(f"Statute tax INR {statute.total_tax:,.0f}.")
+        notes_parts.append(f"Tax tax INR {statute.total_tax:,.0f}.")
     if channel:
         notes_parts.append(
-            f"Channel annual drag INR {channel.annual_drag_rupees:,.0f}."
+            f"Fees annual drag INR {channel.annual_drag_rupees:,.0f}."
         )
     return ReframeBrief(
         goal=goal.goal,
@@ -443,7 +443,7 @@ def default_shared_brief(
     channel: ChannelVerdict | None,
     reframe: ReframeVerdict | None,
 ) -> SharedBrief:
-    """Shared brief assembled from every prior stage."""
+    """Verdict brief assembled from every prior stage."""
     priced = []
     if reframe:
         for lever in reframe.levers:
@@ -495,7 +495,7 @@ def run_pipeline(
     trace: bool = False,
     sink: Any = None,
 ) -> PipelineRun:
-    """Run Feasibility → Statute → Channel → Reframe → Shared."""
+    """Run Planner → Tax → Fees → Rethink → Verdict."""
     _require_credentials()
     resolved = model or llm_model()
 

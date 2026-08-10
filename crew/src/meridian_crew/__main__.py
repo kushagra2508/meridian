@@ -1,7 +1,7 @@
 """CLI for the Meridian agent desk.
 
 Default command runs the full pipeline
-(Feasibility → Statute → Channel → Reframe → Shared):
+(Planner → Tax → Fees → Rethink → Verdict):
 
     uv run meridian \
       --goal "Daughter's undergraduate tuition" \
@@ -56,11 +56,11 @@ DEFAULT_ALLOCATION = (
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="meridian",
-        description="Run the Meridian agent desk (Feasibility through Shared).",
+        description="Run the Meridian agent desk (Planner through Verdict).",
     )
     parser.add_argument(
         "--agent",
-        choices=("pipeline", "feasibility", "statute", "channel", "reframe", "shared"),
+        choices=("pipeline", "planner", "tax", "fees", "rethink", "verdict"),
         default="pipeline",
         help="Which agent (or the full pipeline) to run. Default: pipeline.",
     )
@@ -84,7 +84,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=float,
         default=1_200_000.0,
         dest="other_taxable_income",
-        help="Taxable income before switch gains (Statute).",
+        help="Taxable income before switch gains (Tax).",
     )
     parser.add_argument("--regime", choices=("new", "old"), default="new")
     parser.add_argument(
@@ -96,12 +96,12 @@ def build_parser() -> argparse.ArgumentParser:
         "--channel-plan",
         choices=("regular", "direct"),
         default="regular",
-        help="Assumed plan type for Channel holdings.",
+        help="Assumed plan type for Fees holdings.",
     )
     parser.add_argument(
         "--disposals",
         default=None,
-        help="Override Statute disposals as category=rupees pairs.",
+        help="Override Tax disposals as category=rupees pairs.",
     )
     parser.add_argument("--model", default=None, help=f"Default: {llm_model()}")
     parser.add_argument(
@@ -170,7 +170,7 @@ def _render_feasibility(verdict: FeasibilityVerdict) -> list[str]:
 
 def _render_statute(verdict: StatuteVerdict) -> list[str]:
     lines = [
-        "STATUTE",
+        "EDGE",
         "",
         verdict.headline,
         "",
@@ -280,9 +280,9 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     if args.stream:
-        if args.agent == "feasibility":
+        if args.agent == "planner":
             return stream_feasibility(goal, model=args.model)
-        if args.agent == "statute":
+        if args.agent == "tax":
             switch = SwitchBrief(
                 purpose=f"Switch for: {goal.goal}",
                 disposals=args.disposals
@@ -293,15 +293,15 @@ def main(argv: list[str] | None = None) -> int:
                 notes=args.notes,
             )
             return stream_statute(switch, model=args.model)
-        if args.agent == "channel":
+        if args.agent == "fees":
             return stream_channel(
                 default_channel_brief(goal, plan=args.channel_plan), model=args.model
             )
-        if args.agent == "reframe":
+        if args.agent == "rethink":
             return stream_reframe(
                 default_reframe_brief(goal, None, None, None), model=args.model
             )
-        if args.agent == "shared":
+        if args.agent == "verdict":
             return stream_shared(
                 default_shared_brief(goal, None, None, None, None), model=args.model
             )
@@ -315,9 +315,9 @@ def main(argv: list[str] | None = None) -> int:
         )
 
     if args.dry_run:
-        print("=== Feasibility brief ===")
+        print("=== Planner brief ===")
         print(goal.as_prompt_block())
-        if args.agent in {"pipeline", "statute"}:
+        if args.agent in {"pipeline", "tax"}:
             preview = default_switch_brief(
                 goal,
                 None,
@@ -333,22 +333,22 @@ def main(argv: list[str] | None = None) -> int:
                     regime=args.regime,
                     age_band=args.age_band,
                 )
-            print("\n=== Statute brief (pre-feasibility preview) ===")
+            print("\n=== Tax brief (pre-feasibility preview) ===")
             print(preview.as_prompt_block())
-        if args.agent in {"pipeline", "channel"}:
-            print("\n=== Channel brief ===")
+        if args.agent in {"pipeline", "fees"}:
+            print("\n=== Fees brief ===")
             print(default_channel_brief(goal, plan=args.channel_plan).as_prompt_block())
-        if args.agent in {"pipeline", "reframe"}:
-            print("\n=== Reframe brief (pre-upstream preview) ===")
+        if args.agent in {"pipeline", "rethink"}:
+            print("\n=== Rethink brief (pre-upstream preview) ===")
             print(default_reframe_brief(goal, None, None, None).as_prompt_block())
-        if args.agent in {"pipeline", "shared"}:
-            print("\n=== Shared brief (pre-upstream preview) ===")
+        if args.agent in {"pipeline", "verdict"}:
+            print("\n=== Verdict brief (pre-upstream preview) ===")
             print(default_shared_brief(goal, None, None, None, None).as_prompt_block())
         print(f"\nModel that would run: {args.model or llm_model()}")
         return 0
 
     try:
-        if args.agent == "feasibility":
+        if args.agent == "planner":
             run = run_feasibility(
                 goal, model=args.model, verbose=args.verbose, trace=args.trace
             )
@@ -363,7 +363,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
             return 0 if run.verdict else 1
 
-        if args.agent == "statute":
+        if args.agent == "tax":
             switch = SwitchBrief(
                 purpose=f"Switch for: {goal.goal}",
                 disposals=args.disposals
@@ -387,7 +387,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
             return 0 if run.verdict else 1
 
-        if args.agent == "channel":
+        if args.agent == "fees":
             run = run_channel(
                 default_channel_brief(goal, plan=args.channel_plan),
                 model=args.model,
@@ -405,7 +405,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
             return 0 if run.verdict else 1
 
-        if args.agent == "reframe":
+        if args.agent == "rethink":
             run = run_reframe(
                 default_reframe_brief(goal, None, None, None),
                 model=args.model,
@@ -423,7 +423,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"\nTools called: {', '.join(run.tools_used) or 'none'}")
             return 0 if run.verdict else 1
 
-        if args.agent == "shared":
+        if args.agent == "verdict":
             run = run_shared(
                 default_shared_brief(goal, None, None, None, None),
                 model=args.model,
@@ -458,7 +458,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.json:
         payload = {
             "model": pipeline.model,
-            "feasibility": {
+            "planner": {
                 "tools_used": pipeline.feasibility.tools_used,
                 "verdict": (
                     pipeline.feasibility.verdict.model_dump()
@@ -466,7 +466,7 @@ def main(argv: list[str] | None = None) -> int:
                     else None
                 ),
             },
-            "statute": {
+            "tax": {
                 "tools_used": pipeline.statute.tools_used if pipeline.statute else [],
                 "verdict": (
                     pipeline.statute.verdict.model_dump()
@@ -474,7 +474,7 @@ def main(argv: list[str] | None = None) -> int:
                     else None
                 ),
             },
-            "channel": {
+            "fees": {
                 "tools_used": pipeline.channel.tools_used if pipeline.channel else [],
                 "verdict": (
                     pipeline.channel.verdict.model_dump()
@@ -482,7 +482,7 @@ def main(argv: list[str] | None = None) -> int:
                     else None
                 ),
             },
-            "reframe": {
+            "rethink": {
                 "tools_used": pipeline.reframe.tools_used if pipeline.reframe else [],
                 "verdict": (
                     pipeline.reframe.verdict.model_dump()
@@ -490,7 +490,7 @@ def main(argv: list[str] | None = None) -> int:
                     else None
                 ),
             },
-            "shared": {
+            "verdict": {
                 "tools_used": pipeline.shared.tools_used if pipeline.shared else [],
                 "verdict": (
                     pipeline.shared.verdict.model_dump()
@@ -510,7 +510,7 @@ def main(argv: list[str] | None = None) -> int:
         if pipeline.statute and isinstance(pipeline.statute.verdict, StatuteVerdict):
             print("\n".join(_render_statute(pipeline.statute.verdict)))
         else:
-            print("STATUTE failed:\n", pipeline.statute.raw if pipeline.statute else "")
+            print("EDGE failed:\n", pipeline.statute.raw if pipeline.statute else "")
         print("\n" + "=" * 60 + "\n")
         if pipeline.channel and isinstance(pipeline.channel.verdict, ChannelVerdict):
             print("\n".join(_render_channel(pipeline.channel.verdict)))

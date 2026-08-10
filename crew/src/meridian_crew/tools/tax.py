@@ -1,4 +1,4 @@
-"""The statute engine the five Statute tools share.
+"""The statute engine the five Tax tools share.
 
 Every rate, threshold and section string is read from `data/tax_rules.json`
 rather than written into the code, so a Budget is a data change and the tools

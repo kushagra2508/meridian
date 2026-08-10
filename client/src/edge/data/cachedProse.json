@@ -1,34 +1,34 @@
 {
-  "feasibility:PROPOSES": {
+  "planner:PROPOSES": {
     "claim": "Reallocate idle cash into equity funds to close the projected shortfall before the deadline.",
     "opening": null
   },
-  "feasibility:CONDITIONS": {
+  "planner:CONDITIONS": {
     "claim": "The goal clears on the current path, subject to the equity-cap and lock-in constraints already priced.",
     "opening": null
   },
-  "feasibility:CONCEDES": {
+  "planner:CONCEDES": {
     "claim": "The stated goal is already funded; no portfolio change is required on feasibility grounds.",
     "opening": null
   },
-  "statute:OBJECTS": {
+  "tax:OBJECTS": {
     "claim": "Realising the proposed switch triggers tax above two percent of corpus under the cited sections.",
-    "opening": "Feasibility closed the gap on paper."
+    "opening": "Planner closed the gap on paper."
   },
-  "statute:CONDITIONS": {
+  "tax:CONDITIONS": {
     "claim": "Tax on the proposed switch stays within the two-percent corpus threshold after exemptions.",
-    "opening": "Feasibility set the switch size."
+    "opening": "Planner set the switch size."
   },
-  "channel:OBJECTS": {
+  "fees:OBJECTS": {
     "claim": "Distributor-held mutual funds still extract recurring TER drag that compounds against the goal.",
-    "opening": "Statute priced the exit cost."
+    "opening": "Tax priced the exit cost."
   },
-  "channel:CONCEDES": {
+  "fees:CONCEDES": {
     "claim": "No mutual-fund distributor drag applies on this observed book.",
-    "opening": "Statute cleared the tax screen."
+    "opening": "Tax cleared the tax screen."
   },
-  "reframe:PROPOSES": {
+  "rethink:PROPOSES": {
     "claim": "The deadline cannot be met inside the equity cap; slip, shrink, or top-up must reprice the goal.",
-    "opening": "Feasibility returned not reachable."
+    "opening": "Planner returned not reachable."
   }
 }

@@ -155,7 +155,7 @@ function toAgentEvent(event: StreamEvent): AgentEvent | null {
 }
 
 /**
- * Runs the CrewAI Feasibility agent as a child process and translates its NDJSON
+ * Runs the CrewAI Planner agent as a child process and translates its NDJSON
  * output into the SSE event stream.
  *
  * This provider needs a local Python environment, so it cannot run on a Node

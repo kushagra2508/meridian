@@ -1,4 +1,4 @@
-"""The Statute agent: prices the capital-gains bill on a proposed switch."""
+"""The Tax agent: prices the capital-gains bill on a proposed switch."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from .config import DEFAULT_EMBEDDED_GAIN_PCT, DEFAULT_HOLDING_MONTHS
 from .tools import statute_tools
 from .tools.tax import AgeBand, Disposal, Regime, coerce_disposals
 
-ROLE = "Capital Gains Statute Analyst"
+ROLE = "Capital Gains Tax Analyst"
 
 GOAL = (
     "Price the Indian capital-gains tax on a proposed fund switch in rupees, "
@@ -38,7 +38,7 @@ BACKSTORY = (
 
 
 class SwitchBrief(BaseModel):
-    """Everything the Statute agent needs to price one proposed switch."""
+    """Everything the Tax agent needs to price one proposed switch."""
 
     purpose: str = Field(
         default="Proposed reallocation",
@@ -158,7 +158,7 @@ def disposals_from_moves(
     holding_months: float = DEFAULT_HOLDING_MONTHS,
     embedded_gain_pct: float = DEFAULT_EMBEDDED_GAIN_PCT,
 ) -> list[dict[str, Any]]:
-    """Turn Feasibility's 'from -> to: N%' moves into Statute disposals."""
+    """Turn Planner's 'from -> to: N%' moves into Tax disposals."""
     disposals: list[dict[str, Any]] = []
     for move in moves or []:
         match = _MOVE_RE.search(move)

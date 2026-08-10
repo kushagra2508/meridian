@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { formatINRPlain } from '../../statute/lib/format'
-import { useStatuteDispatch, useStatuteState } from '../../statute/store'
+import { formatINRPlain } from '../../edge/lib/format'
+import { useEdgeDispatch, useEdgeState } from '../../edge/store'
 
 const DWELL_MS = 3000
 
 export function EligibilityStep() {
-  const { committee, position } = useStatuteState()
-  const dispatch = useStatuteDispatch()
+  const { committee, position } = useEdgeState()
+  const dispatch = useEdgeDispatch()
   const [progress, setProgress] = useState(0)
   const { ladder, highestEligible } = committee.eligibility
 

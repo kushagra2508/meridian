@@ -64,7 +64,7 @@ class ProseWriterResult(BaseModel):
 
 
 _SYSTEM = """\
-You are the Shared desk writer for a wealth platform.
+You are the Verdict desk writer for a wealth platform.
 Return ONLY valid JSON matching this schema:
 {
   "stances": [
@@ -130,10 +130,10 @@ class ProseWriterTool(BaseTool):
             "best_path": best_path,
             "ledger_summary": ledger_summary,
             "headlines": {
-                "feasibility": feasibility_headline,
-                "statute": statute_headline,
-                "channel": channel_headline,
-                "reframe": reframe_headline,
+                "planner": feasibility_headline,
+                "tax": statute_headline,
+                "fees": channel_headline,
+                "rethink": reframe_headline,
             },
             "eligibility_note": eligibility_note,
             "cross_references": refs,
@@ -150,7 +150,7 @@ class ProseWriterTool(BaseTool):
             data = _extract_json(str(raw))
             result = ProseWriterResult.model_validate(data)
         except (json.JSONDecodeError, ValidationError, ValueError) as error:
-            # Deterministic fallback so the Shared stage still closes.
+            # Deterministic fallback so the Verdict stage still closes.
             paths = ["status_quo", "slip_year", "shrink_target", "monthly_topup"]
             stances = []
             for path in paths:

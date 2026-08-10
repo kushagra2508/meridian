@@ -14,7 +14,7 @@ import { runReframe } from './reframe'
 import { priceSwitchTax } from './tax'
 
 const LIVE = { tier: 'live' as const, label: 'mfapi.in' }
-const STATUTE = { tier: 'statute' as const, label: 'IT Act' }
+const TAX_RULE = { tier: 'statute' as const, label: 'IT Act' }
 const ASSUMPTION = { tier: 'assumption' as const, label: 'model' }
 
 function goalProbability(projected: number, goalAmount: number): number {
@@ -35,15 +35,15 @@ export function runCommittee(
   const illiquidPct = position.alloc.real_estate + position.alloc.gold * 0.5
 
   const alreadyMet = projection.gap <= 0 && projection.switchAmount === 0
-  const feasibilityStance = alreadyMet
+  const plannerStance = alreadyMet
     ? 'CONCEDES'
     : projection.feasible
       ? 'PROPOSES'
       : 'CONDITIONS'
 
-  const feasibility: AgentPosition = {
-    agent: 'feasibility',
-    stance: feasibilityStance,
+  const planner: AgentPosition = {
+    agent: 'planner',
+    stance: plannerStance,
     figures: [
       {
         key: 'projected',
@@ -78,17 +78,17 @@ export function runCommittee(
     handoff,
   )
   const taxThreshold = 0.02 * position.totalWealth
-  const statuteStance =
+  const taxStance =
     tax.totalTax > taxThreshold ? 'OBJECTS' : 'CONDITIONS'
 
-  const statute: AgentPosition = {
-    agent: 'statute',
-    stance: alreadyMet ? 'CONDITIONS' : statuteStance,
+  const taxAgent: AgentPosition = {
+    agent: 'tax',
+    stance: alreadyMet ? 'CONDITIONS' : taxStance,
     figures: [
       {
         key: 'totalTax',
         value: alreadyMet ? 0 : tax.totalTax,
-        badge: { ...STATUTE, label: tax.lines[0]?.section ?? '§112A' },
+        badge: { ...TAX_RULE, label: tax.lines[0]?.section ?? '§112A' },
       },
       {
         key: 'embeddedGain',
@@ -98,20 +98,20 @@ export function runCommittee(
       {
         key: 'fyStagerSaving',
         value: tax.fyStagerSaving ?? 0,
-        badge: { ...STATUTE, label: '§112A ×2 FY' },
+        badge: { ...TAX_RULE, label: '§112A ×2 FY' },
       },
     ],
-    referencesAgent: 'feasibility',
+    referencesAgent: 'planner',
     scopeLimits: [
       'Set-off, carry-forward, and residency rules are out of scope.',
       `unrealisedGainPct=${position.unrealisedGainPct} is an assumption.`,
     ],
   }
 
-  const channelStance = drag.annualDrag > 0 ? 'OBJECTS' : 'CONCEDES'
-  const channel: AgentPosition = {
-    agent: 'channel',
-    stance: channelStance,
+  const feesStance = drag.annualDrag > 0 ? 'OBJECTS' : 'CONCEDES'
+  const fees: AgentPosition = {
+    agent: 'fees',
+    stance: feesStance,
     figures: [
       {
         key: 'annualDrag',
@@ -132,20 +132,20 @@ export function runCommittee(
         badge: ASSUMPTION,
       },
     ],
-    referencesAgent: 'statute',
+    referencesAgent: 'tax',
     scopeLimits: [drag.scopeNote],
   }
 
-  const positions: AgentPosition[] = [feasibility, statute, channel]
+  const positions: AgentPosition[] = [planner, taxAgent, fees]
   const objections: string[] = []
-  if (statute.stance === 'OBJECTS') {
+  if (taxAgent.stance === 'OBJECTS') {
     objections.push(
-      `Statute: tax ₹${Math.round(tax.totalTax).toLocaleString('en-IN')} exceeds 2% of corpus.`,
+      `Tax: ₹${Math.round(tax.totalTax).toLocaleString('en-IN')} exceeds 2% of corpus.`,
     )
   }
-  if (channel.stance === 'OBJECTS') {
+  if (fees.stance === 'OBJECTS') {
     objections.push(
-      `Channel: annual distributor drag ₹${Math.round(drag.annualDrag).toLocaleString('en-IN')} remains.`,
+      `Fees: annual distributor drag ₹${Math.round(drag.annualDrag).toLocaleString('en-IN')} remains.`,
     )
   }
 
@@ -154,7 +154,7 @@ export function runCommittee(
     reframeFired = true
     const reframe = runReframe(position, goal)
     positions.push({
-      agent: 'reframe',
+      agent: 'rethink',
       stance: 'PROPOSES',
       figures: reframe.options.map((opt) => ({
         key: opt.id,
@@ -166,8 +166,8 @@ export function runCommittee(
               : opt.slipMonths,
         badge: ASSUMPTION,
       })),
-      referencesAgent: 'feasibility',
-      scopeLimits: ['Reframe prices consequences; it does not issue advice.'],
+      referencesAgent: 'planner',
+      scopeLimits: ['Rethink prices consequences; it does not issue advice.'],
     })
   }
 

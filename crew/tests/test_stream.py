@@ -119,7 +119,7 @@ def test_the_closing_summary_counts_tools_and_names_the_verdict(verdict) -> None
     )
 
     assert "2 tool call(s)" in _summary(run)
-    assert "Feasibility complete" in _summary(run)
+    assert "Planner complete" in _summary(run)
 
 
 def test_a_run_without_a_verdict_still_summarises() -> None:

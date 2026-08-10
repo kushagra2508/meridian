@@ -1,4 +1,4 @@
-"""CrewAI Feasibility agent for the Meridian wealth platform.
+"""CrewAI Planner agent for the Meridian wealth platform.
 
 Importing `crewai` creates its storage directory as a side effect, so the
 environment is pointed at a project-local path before that happens. Otherwise

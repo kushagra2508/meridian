@@ -1,4 +1,4 @@
-"""Shared parsing and blending helpers for the Feasibility tools.
+"""Verdict parsing and blending helpers for the Planner tools.
 
 Allocations cross the tool boundary as a **list of explicit objects**, not as a
 mapping. A mapping keyed by category can only be described in JSON Schema through

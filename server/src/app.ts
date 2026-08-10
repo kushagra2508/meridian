@@ -4,7 +4,7 @@ import { agentRouter } from './routes/agent.js'
 import { intelligenceRouter } from './routes/intelligence.js'
 import { personaRouter } from './routes/personas.js'
 import { portfolioRouter } from './routes/portfolio.js'
-import { statuteRouter } from './routes/statute.js'
+import { edgeRouter } from './routes/edge.js'
 
 export function createApp() {
   const app = express()
@@ -20,7 +20,7 @@ export function createApp() {
   app.use('/api/portfolio', portfolioRouter)
   app.use('/api/intelligence', intelligenceRouter)
   app.use('/api/agent', agentRouter)
-  app.use('/api/statute', statuteRouter)
+  app.use('/api/edge', edgeRouter)
 
   app.use('/api', (_req, res) => {
     res.status(404).json({ error: 'not_found' })

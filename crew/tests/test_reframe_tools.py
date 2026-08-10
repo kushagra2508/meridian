@@ -1,4 +1,4 @@
-"""Deterministic maths for the Reframe tool pack."""
+"""Deterministic maths for the Rethink tool pack."""
 
 from __future__ import annotations
 

@@ -1,11 +1,11 @@
 import type { AgentReportCard } from '../../hooks/useAgentRun'
 
 const agentTone: Record<string, string> = {
-  Feasibility: 'border-primary/40 bg-primary/5',
-  Statute: 'border-secondary/40 bg-secondary/5',
-  Channel: 'border-tertiary/40 bg-tertiary/5',
-  Reframe: 'border-primary/30 bg-surface-container-low',
-  Shared: 'border-outline-variant bg-surface-container-high/40',
+  Planner: 'border-primary/40 bg-primary/5',
+  Tax: 'border-secondary/40 bg-secondary/5',
+  Fees: 'border-tertiary/40 bg-tertiary/5',
+  Rethink: 'border-primary/30 bg-surface-container-low',
+  Verdict: 'border-outline-variant bg-surface-container-high/40',
 }
 
 interface AgentReportsProps {
@@ -35,7 +35,7 @@ export function AgentReports({
           {running ? statusLabel : 'Waiting for the desk'}
         </h3>
         <p className="mt-2 max-w-xl font-body text-body text-on-surface-variant">
-          Feasibility through Shared write their verdicts here as each stage
+          Planner through Verdict write their verdicts here as each stage
           finishes. Tool calls stay in the console on the right.
         </p>
       </div>
@@ -76,6 +76,11 @@ export function AgentReports({
                 <span className="font-footnote text-footnote text-on-surface-variant">
                   {report.title}
                 </span>
+                {report.source === 'cached' ? (
+                  <span className="rounded bg-surface-container-high px-2 py-0.5 font-label-caps text-[10px] uppercase tracking-wider text-on-surface-variant">
+                    Cached · &lt;5s
+                  </span>
+                ) : null}
               </div>
               <span className="font-footnote text-footnote text-on-surface-variant">{report.at}</span>
             </div>

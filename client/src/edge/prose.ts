@@ -38,7 +38,7 @@ export async function requestProse(
   try {
     const controller = new AbortController()
     const timeout = window.setTimeout(() => controller.abort(), 6000)
-    const res = await fetch('/api/statute/prose', {
+    const res = await fetch('/api/edge/prose', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

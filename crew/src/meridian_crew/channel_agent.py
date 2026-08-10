@@ -1,4 +1,4 @@
-"""The Channel agent: prices Regular-vs-Direct expense drag on the MF sleeve."""
+"""The Fees agent: prices Regular-vs-Direct expense drag on the MF sleeve."""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from .agent import build_llm
 from .tools import channel_tools
 from .tools.drag_calc import HoldingLine, coerce_holdings
 
-ROLE = "Fund Channel Cost Analyst"
+ROLE = "Fund Fees Cost Analyst"
 
 GOAL = (
     "Measure what the client pays for staying in Regular-plan mutual funds "
@@ -35,7 +35,7 @@ Plan = Literal["regular", "direct"]
 
 
 class ChannelBrief(BaseModel):
-    """Portfolio the Channel agent prices for Regular-vs-Direct drag."""
+    """Portfolio the Fees agent prices for Regular-vs-Direct drag."""
 
     portfolio_value: float = Field(gt=0)
     holdings: list[HoldingLine] = Field(
@@ -128,7 +128,7 @@ def holdings_from_allocation(
     plan: Plan = "regular",
     extra: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Build Channel holdings from a Feasibility allocation mapping."""
+    """Build Fees holdings from a Planner allocation mapping."""
     holdings = [
         {
             "category": key,

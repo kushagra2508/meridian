@@ -1,7 +1,9 @@
-import { runDrag } from '../../statute/engine/drag'
-import { formatINR, formatINRPlain, formatPct, parseINRInput } from '../../statute/lib/format'
-import { useStatuteDispatch, useStatuteState } from '../../statute/store'
-import type { AssetKey } from '../../statute/types'
+import type { ReactNode } from 'react'
+import { runDrag } from '../../edge/engine/drag'
+import { listPersonas } from '../../edge/fromPersona'
+import { formatINR, formatINRPlain, formatPct, parseINRInput } from '../../edge/lib/format'
+import { useEdgeDispatch, useEdgeState } from '../../edge/store'
+import type { AssetKey } from '../../edge/types'
 import { Icon } from '../Icon'
 
 const ROWS: { key: AssetKey; label: string; tone: string }[] = [
@@ -14,14 +16,16 @@ const ROWS: { key: AssetKey; label: string; tone: string }[] = [
 ]
 
 export function PositionStep() {
-  const { position } = useStatuteState()
-  const dispatch = useStatuteDispatch()
+  const { position, round1, personaId } = useEdgeState()
+  const dispatch = useEdgeDispatch()
   const drag = runDrag(position)
+  const personas = listPersonas()
 
   const allocSum = ROWS.reduce((acc, row) => acc + position.alloc[row.key], 0)
   // Mirrors the committee's illiquid definition: gold is treated as half-liquid.
   const illiquidFraction = position.alloc.real_estate + position.alloc.gold * 0.5
   const liquidFraction = Math.max(0, 1 - illiquidFraction)
+  const equityPlusDeposit = round1.equityAllocationPct + round1.depositAllocationPct
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden lg:flex-row">
@@ -29,14 +33,126 @@ export function PositionStep() {
         <div className="mx-auto w-full max-w-4xl p-margin-page">
           <div className="mb-stack-loose flex flex-wrap items-end justify-between gap-3 border-b border-rule pb-stack-compact">
             <h2 className="font-headline-md text-headline-md text-primary">Observed position</h2>
-            <button
-              type="button"
-              onClick={() => dispatch({ type: 'LOAD_TYPICAL_P2' })}
-              className="flex items-center gap-2 border border-rule bg-surface px-3 py-1.5 font-label-caps text-label-caps uppercase text-on-surface-variant transition-colors hover:text-secondary"
-            >
-              <Icon name="download" className="text-[14px]" />
-              Load typical allocation for P2
-            </button>
+          </div>
+
+          <div className="mb-stack-loose">
+            <h4 className="mb-stack-compact font-label-caps text-label-caps uppercase text-on-surface-variant">
+              Round-1 persona presets
+            </h4>
+            <div className="flex flex-wrap gap-2">
+              {personas.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  onClick={() => dispatch({ type: 'LOAD_PERSONA', id: p.id })}
+                  className={`rounded border px-3 py-1.5 font-label-caps text-label-caps uppercase transition-colors ${
+                    personaId === p.id
+                      ? 'border-primary bg-primary text-on-primary'
+                      : 'border-rule bg-surface text-on-surface-variant hover:text-primary'
+                  }`}
+                >
+                  {p.id} · {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-stack-loose border border-rule bg-surface-container-low p-stack-dense">
+            <div className="mb-stack-compact flex items-center justify-between">
+              <h4 className="font-label-caps text-label-caps uppercase text-on-surface-variant">
+                Round-1 levers
+              </h4>
+              <span
+                className={`font-data-md text-[12px] ${
+                  equityPlusDeposit > 100 ? 'text-error' : 'text-primary'
+                }`}
+              >
+                Equity + deposit = {equityPlusDeposit}%
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <LeverRow
+                label="Age"
+                value={`${round1.age}`}
+                control={
+                  <input
+                    type="range"
+                    aria-label="Age"
+                    className="w-full"
+                    min={22}
+                    max={72}
+                    value={round1.age}
+                    onChange={(e) =>
+                      dispatch({ type: 'SET_ROUND1', levers: { age: Number(e.target.value) } })
+                    }
+                  />
+                }
+              />
+              <LeverRow
+                label="Salary (annual)"
+                value={formatINRPlain(round1.salary)}
+                control={
+                  <input
+                    type="range"
+                    aria-label="Salary"
+                    className="w-full"
+                    min={5_000_000}
+                    max={60_000_000}
+                    step={500_000}
+                    value={round1.salary}
+                    onChange={(e) =>
+                      dispatch({ type: 'SET_ROUND1', levers: { salary: Number(e.target.value) } })
+                    }
+                  />
+                }
+              />
+              <LeverRow
+                label="Equity allocation"
+                value={`${round1.equityAllocationPct}%`}
+                control={
+                  <input
+                    type="range"
+                    aria-label="Equity allocation"
+                    className="w-full"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={round1.equityAllocationPct}
+                    onChange={(e) =>
+                      dispatch({
+                        type: 'SET_ROUND1',
+                        levers: { equityAllocationPct: Number(e.target.value) },
+                      })
+                    }
+                  />
+                }
+              />
+              <LeverRow
+                label="Deposit allocation"
+                value={`${round1.depositAllocationPct}%`}
+                control={
+                  <input
+                    type="range"
+                    aria-label="Deposit allocation"
+                    className="w-full"
+                    min={0}
+                    max={100}
+                    step={5}
+                    value={round1.depositAllocationPct}
+                    onChange={(e) =>
+                      dispatch({
+                        type: 'SET_ROUND1',
+                        levers: { depositAllocationPct: Number(e.target.value) },
+                      })
+                    }
+                  />
+                }
+              />
+            </div>
+            <p className="mt-2 font-citation text-citation uppercase leading-relaxed text-on-surface-variant">
+              Same levers as Round 1. Equity + deposit is hard-capped at 100%. Remainder maps to
+              gold and real estate. Wealth defaults to salary × 55 and can be overridden below.
+            </p>
           </div>
 
           <div className="mb-stack-loose grid grid-cols-1 gap-stack-compact md:grid-cols-3">
@@ -84,8 +200,9 @@ export function PositionStep() {
               <h4 className="font-label-caps text-label-caps uppercase text-on-surface-variant">
                 Asset class allocation
               </h4>
-              <span className="rounded-sm bg-tertiary-fixed px-2 py-0.5 font-data-md text-[12px] text-primary">
-                {(allocSum * 100).toFixed(2)}%
+              <span className="inline-flex items-center gap-1 rounded-sm bg-tertiary-fixed px-2 py-0.5 font-data-md text-[12px] text-primary">
+                <Icon name="lock" className="text-[12px]" />
+                {(allocSum * 100).toFixed(0)}% allocated
               </span>
             </div>
             <div className="flex h-1.5 w-full overflow-hidden border border-rule bg-surface">
@@ -97,6 +214,10 @@ export function PositionStep() {
                 />
               ))}
             </div>
+            <p className="mt-2 font-citation text-citation uppercase leading-relaxed text-on-surface-variant">
+              Detail view of the Round-1 split. Raising one class draws proportionally from the
+              others — the six weights always total 100%.
+            </p>
           </div>
 
           <div className="flex flex-col border-t border-rule">
@@ -119,13 +240,11 @@ export function PositionStep() {
                     value={Math.round(position.alloc[row.key] * 100)}
                     onChange={(e) =>
                       dispatch({
-                        type: 'SET_ALLOC',
-                        alloc: { [row.key]: Number(e.target.value) / 100 },
+                        type: 'SET_ALLOC_WEIGHT',
+                        key: row.key,
+                        value: Number(e.target.value) / 100,
                       })
                     }
-                    onBlur={() => dispatch({ type: 'NORMALIZE_ALLOC' })}
-                    onMouseUp={() => dispatch({ type: 'NORMALIZE_ALLOC' })}
-                    onTouchEnd={() => dispatch({ type: 'NORMALIZE_ALLOC' })}
                   />
                 </div>
                 <div className="w-16 text-right font-data-md text-data-md text-primary">
@@ -317,6 +436,24 @@ export function PositionStep() {
           </div>
         </div>
       </aside>
+    </div>
+  )
+}
+
+function LeverRow({
+  label,
+  value,
+  control,
+}: {
+  label: string
+  value: string
+  control: ReactNode
+}) {
+  return (
+    <div className="-mx-2 flex flex-wrap items-center px-2 py-stack-compact">
+      <div className="w-1/3 min-w-[120px] font-body-md text-body-md text-primary">{label}</div>
+      <div className="flex-1 px-stack-dense">{control}</div>
+      <div className="w-28 text-right font-data-md text-data-md text-primary">{value}</div>
     </div>
   )
 }

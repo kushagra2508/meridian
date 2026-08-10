@@ -30,7 +30,7 @@ class LedgerClaim(BaseModel):
     )
     source: str = Field(
         default="desk",
-        description="Which stage produced the claim: Feasibility, Statute, Channel, Reframe.",
+        description="Which stage produced the claim: Planner, Tax, Fees, Rethink.",
     )
     note: str | None = None
 
@@ -83,8 +83,8 @@ class LedgerResult(BaseModel):
 class LedgerTool(BaseTool):
     name: str = "ledger"
     description: str = (
-        "Collect signed rupee claims from Feasibility / Statute / Channel / "
-        "Reframe and rank the open paths. Pass claims as "
+        "Collect signed rupee claims from Planner / Tax / Fees / "
+        "Rethink and rank the open paths. Pass claims as "
         "[{path, label, amount, sign, source}] where costs are negative (or "
         "sign='cost') and benefits are positive. Returns paths ordered best "
         "first by net_rupees."

@@ -1,8 +1,8 @@
 import { useEffect, useMemo } from 'react'
 import { useAgentRun } from '../../hooks/useAgentRun'
 import { useSequentialVerdicts } from '../../hooks/useSequentialVerdicts'
-import { committeeToReports } from '../../statute/mapToReports'
-import { useStatuteDispatch, useStatuteState } from '../../statute/store'
+import { committeeToReports } from '../../edge/mapToReports'
+import { useEdgeDispatch, useEdgeState } from '../../edge/store'
 import { Icon } from '../Icon'
 import { AgentConsole } from '../intelligence/AgentConsole'
 import { AgentReports } from '../intelligence/AgentReports'
@@ -10,8 +10,8 @@ import { AgentReports } from '../intelligence/AgentReports'
 const DEFAULT_PROMPT = 'Can we fund the stated goal with the current plan?'
 
 export function CommitteeStep() {
-  const { committee, handoff, proseSource } = useStatuteState()
-  const dispatch = useStatuteDispatch()
+  const { committee, handoff } = useEdgeState()
+  const dispatch = useEdgeDispatch()
   const {
     items,
     reports,
@@ -23,9 +23,10 @@ export function CommitteeStep() {
   } = useAgentRun(DEFAULT_PROMPT)
 
   const deskReports = useMemo(() => committeeToReports(committee), [committee])
-  const { visibleReports, expectedCount, pendingAgent } = useSequentialVerdicts(
+  const { visibleReports, expectedCount, pendingAgent, usedCache } = useSequentialVerdicts(
     deskReports,
     reports,
+    { timeoutMs: 5000, forceCached: Boolean(agentError) },
   )
 
   const committeeKey = useMemo(
@@ -40,7 +41,7 @@ export function CommitteeStep() {
     start(DEFAULT_PROMPT)
   }, [committeeKey, start])
 
-  const hasReframe = committee.positions.some((p) => p.agent === 'reframe')
+  const hasRethink = committee.positions.some((p) => p.agent === 'rethink')
 
   return (
     <div className="flex flex-1 flex-col gap-gutter overflow-y-auto p-margin-page lg:flex-row lg:overflow-hidden">
@@ -51,20 +52,25 @@ export function CommitteeStep() {
             <Icon name="gavel" className="text-[28px] text-primary" />
           </h1>
           <p className="mt-2 font-body-md text-body-md text-on-surface-variant">
-            {handoff.persona} · Feasibility → Statute → Channel
-            {hasReframe ? ' → Reframe' : ''}. Verdict cards appear as each stage completes.
+            {handoff.persona} · Planner → Tax → Fees
+            {hasRethink ? ' → Rethink' : ''} → Verdict. Numbers update instantly; each stage
+            advances within 5s even if the stream stalls.
           </p>
-          {proseSource === 'cached' ? (
+          {usedCache || agentError ? (
             <p className="mt-2 inline-flex bg-surface-container-high px-2 py-1 font-label-caps text-label-caps uppercase tracking-wider text-on-surface-variant">
-              Reasoning cached
+              Reasoning cached · offline-safe
             </p>
           ) : null}
         </header>
 
         <AgentReports
           reports={visibleReports}
-          running={running}
-          statusLabel={status.label}
+          running={running && !usedCache}
+          statusLabel={
+            pendingAgent
+              ? `${pendingAgent} deliberating (max 5s)`
+              : status.label
+          }
           expectedCount={expectedCount}
           pendingAgent={pendingAgent}
         />

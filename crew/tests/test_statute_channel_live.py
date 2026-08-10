@@ -1,4 +1,4 @@
-"""Live Statute and Channel runs against gpt-5-mini (via OpenRouter).
+"""Live Tax and Fees runs against gpt-5-mini (via OpenRouter).
 
 Marked `live`, so excluded from the default suite.
 

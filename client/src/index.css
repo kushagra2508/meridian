@@ -2,10 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* STATUTE range inputs — hairline track, ink thumb */
+/* EDGE range inputs — hairline track, ink thumb */
 input[type='range'].accent-primary,
 input[type='range'].accent-secondary,
-.statute-range {
+.edge-range {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;

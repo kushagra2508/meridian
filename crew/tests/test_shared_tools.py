@@ -1,4 +1,4 @@
-"""Deterministic Shared tool pack tests (eligibility + ledger)."""
+"""Deterministic Verdict tool pack tests (eligibility + ledger)."""
 
 from __future__ import annotations
 
@@ -41,7 +41,7 @@ def test_ledger_ranks_by_signed_net():
                 "label": "Do nothing",
                 "amount": 601_298,
                 "sign": "cost",
-                "source": "Feasibility",
+                "source": "Planner",
                 "note": "shortfall",
             },
             {
@@ -49,21 +49,21 @@ def test_ledger_ranks_by_signed_net():
                 "label": "Shrink",
                 "amount": 40_000,
                 "sign": "cost",
-                "source": "Reframe",
+                "source": "Rethink",
             },
             {
                 "path": "monthly_topup",
                 "label": "Top up",
                 "amount": 80_000,
                 "sign": "cost",
-                "source": "Reframe",
+                "source": "Rethink",
             },
             {
                 "path": "shrink_target",
                 "label": "Tax",
                 "amount": 19_500,
                 "sign": "cost",
-                "source": "Statute",
+                "source": "Tax",
             },
         ]
     )

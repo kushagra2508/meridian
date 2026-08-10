@@ -1,4 +1,4 @@
-"""Deterministic maths for the Channel tools -- no network, no LLM."""
+"""Deterministic maths for the Fees tools -- no network, no LLM."""
 
 from __future__ import annotations
 

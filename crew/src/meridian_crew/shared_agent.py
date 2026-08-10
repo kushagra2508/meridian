@@ -1,4 +1,4 @@
-"""The Shared agent: eligibility, ledger ranking, and the final prose package."""
+"""The Verdict agent: eligibility, ledger ranking, and the final prose package."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from .agent import build_llm
 from .tools import shared_tools
 
-ROLE = "Shared Desk Synthesizer"
+ROLE = "Verdict Desk Synthesizer"
 
 GOAL = (
     "Gate the client on the SEBI product ladder, rank every open path by signed "
@@ -27,7 +27,7 @@ BACKSTORY = (
 
 
 class SharedBrief(BaseModel):
-    """Everything Shared needs from the prior stages."""
+    """Everything Verdict needs from the prior stages."""
 
     goal: str
     investable_corpus: float = Field(gt=0)
@@ -57,25 +57,25 @@ class SharedBrief(BaseModel):
             f"Investable corpus: {self.currency} {self.investable_corpus:,.0f}",
         ]
         if self.feasibility_headline:
-            lines.append(f"Feasibility: {self.feasibility_headline}")
+            lines.append(f"Planner: {self.feasibility_headline}")
         if self.feasibility_verdict:
-            lines.append(f"Feasibility verdict: {self.feasibility_verdict}")
+            lines.append(f"Planner verdict: {self.feasibility_verdict}")
         if self.shortfall is not None:
             lines.append(f"Shortfall: {self.currency} {self.shortfall:,.0f}")
         if self.statute_headline:
-            lines.append(f"Statute: {self.statute_headline}")
+            lines.append(f"Tax: {self.statute_headline}")
         if self.statute_tax is not None:
-            lines.append(f"Statute tax: {self.currency} {self.statute_tax:,.0f}")
+            lines.append(f"Tax tax: {self.currency} {self.statute_tax:,.0f}")
         if self.channel_headline:
-            lines.append(f"Channel: {self.channel_headline}")
+            lines.append(f"Fees: {self.channel_headline}")
         if self.channel_annual_drag is not None:
             lines.append(
-                f"Channel annual drag: {self.currency} {self.channel_annual_drag:,.0f}"
+                f"Fees annual drag: {self.currency} {self.channel_annual_drag:,.0f}"
             )
         if self.reframe_headline:
-            lines.append(f"Reframe: {self.reframe_headline}")
+            lines.append(f"Rethink: {self.reframe_headline}")
         if self.preferred_lever:
-            lines.append(f"Reframe preferred lever: {self.preferred_lever}")
+            lines.append(f"Rethink preferred lever: {self.preferred_lever}")
         if self.slip_delay_months is not None:
             lines.append(f"Slip delay months: {self.slip_delay_months}")
         if self.shrink_rupees is not None:

@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { formatINRPlain, parseINRInput } from '../../statute/lib/format'
-import { useStatuteDispatch, useStatuteState } from '../../statute/store'
+import { formatINRPlain, parseINRInput } from '../../edge/lib/format'
+import { useEdgeDispatch, useEdgeState } from '../../edge/store'
 import { Icon } from '../Icon'
 
 const PURPOSES = ['retirement', 'education', 'property', 'legacy'] as const
@@ -9,8 +9,8 @@ const SENTENCE_INPUT =
   'border-0 border-b border-secondary bg-transparent px-1 text-center font-data-lg text-data-lg text-primary outline-none transition-[border-width] focus:border-b-2 focus:outline-none'
 
 export function GoalStep() {
-  const { goal } = useStatuteState()
-  const dispatch = useStatuteDispatch()
+  const { goal } = useEdgeState()
+  const dispatch = useEdgeDispatch()
   const [error, setError] = useState<string | null>(null)
 
   function submit(e: FormEvent) {
@@ -140,7 +140,7 @@ export function GoalStep() {
             type="submit"
             className="flex items-center gap-2 rounded bg-primary px-stack-loose py-3 font-label-caps text-label-caps uppercase text-on-primary transition-colors hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 focus:ring-offset-background"
           >
-            Test feasibility
+            Test reachability
             <Icon name="arrow_forward" className="text-[16px]" />
           </button>
         </div>

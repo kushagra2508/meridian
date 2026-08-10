@@ -1,6 +1,8 @@
 import type { AgentReportCard } from '../hooks/useAgentRun'
+import { displayAgent } from './agents'
+import cachedProse from './data/cachedProse.json'
 import { formatINR, formatPct } from './lib/format'
-import type { AgentPosition, CommitteeResult, LedgerRow } from './types'
+import type { AgentId, AgentPosition, CommitteeResult, LedgerRow, Stance } from './types'
 
 function formatFigure(key: string, value: number): string {
   if (key.toLowerCase().includes('return') || key === 'blendedReturn') {
@@ -8,6 +10,11 @@ function formatFigure(key: string, value: number): string {
   }
   if (key === 'slip_year') return `${Math.round(value)} mo`
   return formatINR(value)
+}
+
+function cachedClaim(agent: AgentId, stance: Stance): string | null {
+  const key = `${agent}:${stance}` as keyof typeof cachedProse
+  return cachedProse[key]?.claim ?? null
 }
 
 export function committeeToReports(committee: CommitteeResult): AgentReportCard[] {
@@ -18,13 +25,15 @@ export function committeeToReports(committee: CommitteeResult): AgentReportCard[
 }
 
 function positionToReport(position: AgentPosition, at: string): AgentReportCard {
-  const label = position.agent[0]!.toUpperCase() + position.agent.slice(1)
+  const label = displayAgent(position.agent)
+  const claim = cachedClaim(position.agent, position.stance)
   return {
-    id: `statute-${position.agent}`,
+    id: `edge-${position.agent}`,
     at,
     agent: label,
     title: position.stance,
     headline:
+      claim ??
       position.scopeLimits[0] ??
       `${label} holds ${position.stance} on the computed figures.`,
     verdict: position.stance,
@@ -34,7 +43,7 @@ function positionToReport(position: AgentPosition, at: string): AgentReportCard 
     })),
     bullets: [
       ...(position.referencesAgent
-        ? [`References ${position.referencesAgent}`]
+        ? [`References ${displayAgent(position.referencesAgent)}`]
         : []),
       ...position.scopeLimits.slice(0, 2),
     ],
@@ -44,9 +53,9 @@ function positionToReport(position: AgentPosition, at: string): AgentReportCard 
 function verdictToReport(committee: CommitteeResult, at: string): AgentReportCard {
   const top = committee.ledger[0] as LedgerRow | undefined
   return {
-    id: 'statute-verdict',
+    id: 'edge-verdict',
     at,
-    agent: 'Shared',
+    agent: 'Verdict',
     title: committee.verdict.state === 'goal_clears' ? 'Goal Clears' : 'Repriced Goals',
     headline: committee.verdict.summary,
     verdict: committee.verdict.state,

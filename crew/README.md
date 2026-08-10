@@ -1,4 +1,4 @@
-# Meridian Crew — Feasibility agent
+# Meridian Crew — Planner agent
 
 A [CrewAI](https://docs.crewai.com/v1.15.14/en/introduction) agent that answers one
 question: **can this client reach this goal, and if not, what is the smallest
@@ -122,7 +122,7 @@ crew/
 │   ├── datasets.py                # cached JSON loaders
 │   ├── data/                      # nav_history.json, products.json
 │   ├── tools/                     # the four tools
-│   ├── agent.py                   # Feasibility agent + task
+│   ├── agent.py                   # Planner agent + task
 │   ├── crew.py                    # crew assembly and kickoff
 │   ├── trace.py                   # event-bus tap for --trace and --stream
 │   ├── stream.py                  # NDJSON events for the Express bridge

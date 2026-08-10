@@ -1,8 +1,8 @@
-"""`price_options` -- re-invoke Statute + Channel maths on each reframed path.
+"""`price_options` -- re-invoke Tax + Fees maths on each reframed path.
 
 This is an internal call, not a second LLM crew: it runs the same deterministic
-tax and TER tools Statute and Channel use, once per option, so every path carries
-a signed rupee cost the Shared ledger can rank.
+tax and TER tools Tax and Fees use, once per option, so every path carries
+a signed rupee cost the Verdict ledger can rank.
 """
 
 from __future__ import annotations
@@ -57,12 +57,12 @@ class PriceOptionsInput(BaseModel):
     )
     portfolio_value: float = Field(gt=0)
     holdings: list[HoldingLine] = Field(
-        description="Current holdings for Channel drag (same shape as drag_calc)."
+        description="Current holdings for Fees drag (same shape as drag_calc)."
     )
     disposals: list[dict[str, Any]] = Field(
         default_factory=list,
         description=(
-            "Switch legs to price through Statute tools. Empty when no "
+            "Switch legs to price through Tax tools. Empty when no "
             "reallocation is on the table."
         ),
     )
@@ -143,7 +143,7 @@ def _price_statute(
     age_band: str,
 ) -> tuple[float, list[str], list[str]]:
     if not disposals:
-        return 0.0, [], ["No disposals: Statute tax is zero on this path."]
+        return 0.0, [], ["No disposals: Tax tax is zero on this path."]
 
     charges, priced = assess(
         disposals,
@@ -176,14 +176,14 @@ def _price_statute(
     return (
         round(float(surcharged.total_tax), 2),
         sections,
-        ["Statute tax from assess() + surcharge_band (same stack as the Statute agent)."],
+        ["Tax tax from assess() + surcharge_band (same stack as the Tax agent)."],
     )
 
 
 class PriceOptionsTool(BaseTool):
     name: str = "price_options"
     description: str = (
-        "Re-invoke Statute and Channel pricing on each reframed option. Pass the "
+        "Re-invoke Tax and Fees pricing on each reframed option. Pass the "
         "options from slip_year / shrink_target / monthly_topup (with their solved "
         "target, years, and contribution), plus holdings and any switch disposals. "
         "Returns statute_tax, channel drag over the path horizon, and all_in_friction "
@@ -220,7 +220,7 @@ class PriceOptionsTool(BaseTool):
             if option.notes:
                 notes.append(option.notes)
             notes.append(
-                f"Channel annual drag INR {annual_drag:,.0f} × "
+                f"Fees annual drag INR {annual_drag:,.0f} × "
                 f"{option.years_to_goal:g}y = INR {horizon_drag:,.0f}."
             )
             priced.append(
@@ -245,15 +245,15 @@ class PriceOptionsTool(BaseTool):
             priced=priced,
             cheapest_kind=cheapest.kind if cheapest else None,
             assumptions=[
-                "Statute tax from ltcg_112a / stcg_111a / debt_slab / surcharge_band.",
-                "Channel drag from drag_calc; horizon drag is annual × years (simple).",
+                "Tax tax from ltcg_112a / stcg_111a / debt_slab / surcharge_band.",
+                "Fees drag from drag_calc; horizon drag is annual × years (simple).",
                 "Same disposals and holdings are applied to every option.",
             ],
         )
 
     def format_output_for_agent(self, raw_result: object) -> str:
         result = PriceOptionsResult.model_validate(raw_result)
-        lines = ["Priced reframed options (Statute + Channel):", ""]
+        lines = ["Priced reframed options (Tax + Fees):", ""]
         for row in result.priced:
             lines.append(
                 f"{row.kind} — {row.label}\n"

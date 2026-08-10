@@ -41,7 +41,7 @@ server/
   src/routes/           portfolio, intelligence, agent
   src/data/             dummy fixtures
   src/agents/           AgentProvider interface + mock and CrewAI implementations
-crew/                   CrewAI Feasibility agent (Python), see crew/README.md
+crew/                   CrewAI Planner agent (Python), see crew/README.md
 ```
 
 ## Routes
@@ -75,7 +75,7 @@ is running.
 | `AGENT_PROVIDER` | Behaviour                                                                      |
 | ---------------- | ------------------------------------------------------------------------------ |
 | `mock` (default) | Replays a scripted multi-agent run. No dependencies, runs anywhere.            |
-| `crew`           | Runs the real CrewAI Feasibility agent in `crew/` and streams its actual work.  |
+| `crew`           | Runs the real CrewAI Planner agent in `crew/` and streams its actual work.  |
 
 `crew` spawns `python -m meridian_crew --stream` and translates its newline-delimited JSON
 into SSE events, which is why it needs a local Python environment (see `crew/README.md`) and

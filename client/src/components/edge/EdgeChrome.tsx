@@ -1,13 +1,13 @@
 import { useState, type ReactNode } from 'react'
-import { FLOW_STEPS, stepIndex } from '../../statute/flow'
-import { useStatuteDispatch, useStatuteState } from '../../statute/store'
+import { FLOW_STEPS, stepIndex } from '../../edge/flow'
+import { useEdgeDispatch, useEdgeState } from '../../edge/store'
 import { Icon } from '../Icon'
 
 /**
  * Navigation shell for the workspace screens. Steps ahead of the current one
  * are not reachable — the flow only moves forward on an explicit action.
  */
-export function StatuteChrome({ children }: { children: ReactNode }) {
+export function EdgeChrome({ children }: { children: ReactNode }) {
   const [navOpen, setNavOpen] = useState(false)
 
   return (
@@ -32,26 +32,28 @@ export function StatuteChrome({ children }: { children: ReactNode }) {
 }
 
 function FlowNav({ open, onNavigate }: { open: boolean; onNavigate: () => void }) {
-  const { screen } = useStatuteState()
-  const dispatch = useStatuteDispatch()
+  const { screen } = useEdgeState()
+  const dispatch = useEdgeDispatch()
   const current = stepIndex(screen)
+  // Glossary is a side door — keep every prior step clickable, highlight none.
+  const inGlossary = screen === 'glossary'
 
   return (
     <nav
-      aria-label="STATUTE flow"
+      aria-label="EDGE flow"
       className={`fixed left-0 top-0 z-40 flex h-screen w-[240px] flex-col border-r border-rule bg-surface-container-low py-stack-dense transition-transform duration-200 md:translate-x-0 ${
         open ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       <div className="mb-stack-loose px-stack-dense">
-        <h1 className="font-headline-sm text-headline-sm tracking-tight text-primary">STATUTE</h1>
-        <p className="mt-1 font-data-md text-data-md text-on-surface-variant">Wealth Engine v1.2</p>
+        <h1 className="font-headline-sm text-headline-sm tracking-tight text-primary">EDGE</h1>
+        <p className="mt-1 font-data-md text-data-md text-on-surface-variant">by Meridian</p>
       </div>
 
       <ol className="flex flex-1 flex-col gap-1">
         {FLOW_STEPS.map((step, i) => {
-          const active = i === current
-          const reachable = i <= current
+          const active = !inGlossary && i === current
+          const reachable = inGlossary || (current >= 0 && i <= current)
           return (
             <li key={step.id}>
               <button
@@ -78,7 +80,7 @@ function FlowNav({ open, onNavigate }: { open: boolean; onNavigate: () => void }
         })}
       </ol>
 
-      <div className="my-stack-dense px-stack-dense">
+      <div className="my-stack-dense flex flex-col gap-2 px-stack-dense">
         <button
           type="button"
           onClick={() => {
@@ -89,13 +91,28 @@ function FlowNav({ open, onNavigate }: { open: boolean; onNavigate: () => void }
         >
           New Scenario
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            dispatch({ type: 'SET_SCREEN', screen: 'glossary' })
+            onNavigate()
+          }}
+          className={`flex w-full items-center gap-3 px-1 py-2 text-left transition-colors ${
+            screen === 'glossary'
+              ? 'text-primary'
+              : 'text-on-surface-variant hover:text-primary'
+          }`}
+        >
+          <Icon name="menu_book" className="text-[18px]" />
+          <span className="font-label-caps text-label-caps uppercase">Glossary</span>
+        </button>
       </div>
     </nav>
   )
 }
 
 function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
-  const { handoff } = useStatuteState()
+  const { handoff } = useEdgeState()
 
   return (
     <header className="sticky top-0 z-20 flex h-20 w-full shrink-0 items-center justify-between border-b border-rule bg-background px-margin-page">
@@ -108,8 +125,11 @@ function TopBar({ onOpenNav }: { onOpenNav: () => void }) {
         >
           <Icon name="menu" />
         </button>
-        <span className="font-display-lg text-[32px] leading-none tracking-tighter text-primary lg:text-display-lg">
-          STATUTE
+        <span className="flex items-baseline gap-2">
+          <span className="font-display-lg text-[32px] leading-none tracking-tighter text-primary lg:text-display-lg">
+            EDGE
+          </span>
+          <span className="font-data-md text-data-md text-on-surface-variant">by Meridian</span>
         </span>
       </div>
 

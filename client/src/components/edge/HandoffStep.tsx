@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react'
-import reference from '../../statute/data/reference.json'
-import { useStatuteDispatch, useStatuteState } from '../../statute/store'
+import reference from '../../edge/data/reference.json'
+import { useEdgeDispatch, useEdgeState } from '../../edge/store'
 
 const RECEIVED_ON = new Date(reference.generated_at)
   .toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   .toUpperCase()
 
 export function HandoffStep() {
-  const { handoff } = useStatuteState()
-  const dispatch = useStatuteDispatch()
+  const { handoff } = useEdgeState()
+  const dispatch = useEdgeDispatch()
 
   return (
     <article className="flex w-full flex-col border border-rule bg-background">
@@ -48,7 +48,7 @@ export function HandoffStep() {
 
         <div className="mb-stack-loose mt-stack-dense">
           <p className="m-0 font-headline-sm text-[18px] italic text-on-surface-variant">
-            Declared at intake. STATUTE re-tests against observed position.
+            Declared at intake. EDGE re-tests against observed position.
           </p>
         </div>
 

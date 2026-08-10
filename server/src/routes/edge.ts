@@ -10,21 +10,21 @@ type PositionIn = {
 }
 
 const CLAIMS: Record<string, string> = {
-  'feasibility:PROPOSES':
+  'planner:PROPOSES':
     'Reallocate idle cash into equity funds to close the projected shortfall before the deadline.',
-  'feasibility:CONDITIONS':
+  'planner:CONDITIONS':
     'The goal clears on the current path, subject to the equity-cap and lock-in constraints already priced.',
-  'feasibility:CONCEDES':
+  'planner:CONCEDES':
     'The stated goal is already funded; no portfolio change is required on feasibility grounds.',
-  'statute:OBJECTS':
+  'tax:OBJECTS':
     'Realising the proposed switch triggers tax above two percent of corpus under the cited sections.',
-  'statute:CONDITIONS':
+  'tax:CONDITIONS':
     'Tax on the proposed switch stays within the two-percent corpus threshold after exemptions.',
-  'channel:OBJECTS':
+  'fees:OBJECTS':
     'Distributor-held mutual funds still extract recurring TER drag that compounds against the goal.',
-  'channel:CONCEDES':
+  'fees:CONCEDES':
     'No mutual-fund distributor drag applies on this observed book.',
-  'reframe:PROPOSES':
+  'rethink:PROPOSES':
     'The deadline cannot be met inside the equity cap; slip, shrink, or top-up must reprice the goal.',
 }
 
@@ -34,9 +34,9 @@ function figureLine(figures: Figure[], key: string): string | null {
   return `${key}=${Math.round(hit.value)}`
 }
 
-export const statuteRouter = Router()
+export const edgeRouter = Router()
 
-statuteRouter.post('/prose', (req, res) => {
+edgeRouter.post('/prose', (req, res) => {
   const positions = (req.body?.positions ?? []) as PositionIn[]
   if (!Array.isArray(positions) || positions.length === 0) {
     res.status(400).json({ error: 'positions_required' })

@@ -40,7 +40,7 @@ export type FigureBadge = {
   label: string
 }
 
-export type AgentId = 'feasibility' | 'statute' | 'channel' | 'reframe'
+export type AgentId = 'planner' | 'tax' | 'fees' | 'rethink'
 
 export type Stance = 'PROPOSES' | 'OBJECTS' | 'CONDITIONS' | 'CONCEDES'
 
@@ -60,13 +60,14 @@ export type AgentPosition = {
   opening?: string | null
 }
 
-export type StatuteScreen =
+export type EdgeScreen =
   | 'handoff'
   | 'position'
   | 'goal'
   | 'eligibility'
   | 'committee'
   | 'verdict'
+  | 'glossary'
 
 export type LedgerRow = {
   path: string

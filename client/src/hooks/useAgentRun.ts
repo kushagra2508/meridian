@@ -26,6 +26,8 @@ export interface AgentStatus {
 export interface AgentReportCard extends AgentReport {
   id: string
   at: string
+  /** Set by the sequential reveal when the card came from the 5s cache path. */
+  source?: 'live' | 'cached'
 }
 
 function reduceEvent(items: ConsoleItem[], event: AgentEvent): ConsoleItem[] {

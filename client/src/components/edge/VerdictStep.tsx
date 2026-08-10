@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { formatINR, formatPct } from '../../statute/lib/format'
-import { useStatuteDispatch, useStatuteState } from '../../statute/store'
-import type { LedgerRow } from '../../statute/types'
+import { formatINR, formatPct } from '../../edge/lib/format'
+import { useEdgeDispatch, useEdgeState } from '../../edge/store'
+import type { LedgerRow } from '../../edge/types'
 
 export function VerdictStep() {
-  const { committee } = useStatuteState()
-  const dispatch = useStatuteDispatch()
+  const { committee } = useEdgeState()
+  const dispatch = useEdgeDispatch()
   const { verdict } = committee
   const [selected, setSelected] = useState<string | null>(null)
 

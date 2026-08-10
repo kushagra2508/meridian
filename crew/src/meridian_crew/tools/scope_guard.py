@@ -1,4 +1,4 @@
-"""`scope_guard` -- names what the Channel tools cannot price.
+"""`scope_guard` -- names what the Fees tools cannot price.
 
 Silence here is the failure mode: an agent that quietly skips a ULIP, a PMS
 mandate or an offshore fund leaves the client thinking the drag figure covers
@@ -42,7 +42,7 @@ KIND_REASONS = {
     "pms": "Portfolio Management Services quote a negotiated fee, not a scheme TER.",
     "aif": "Alternative Investment Funds sit outside the mutual-fund TER regime.",
     "equity_direct": "Direct equity holdings have brokerage, not a fund expense ratio.",
-    "real_estate": "Property and REITs are outside this Channel scope.",
+    "real_estate": "Property and REITs are outside this Fees scope.",
     "offshore": "Foreign-domiciled funds are not in the AMFI TER disclosure.",
     "crypto": "Digital assets are out of scope for AMFI TER pricing.",
     "other": "No TER mapping is on file for this product kind.",
@@ -124,7 +124,7 @@ def _product_index() -> dict[str, dict[str, Any]]:
 class ScopeGuardTool(BaseTool):
     name: str = "scope_guard"
     description: str = (
-        "Identify which holdings the Channel tools can price and which they "
+        "Identify which holdings the Fees tools can price and which they "
         "cannot. Give it a list of {id, kind?, label?} objects covering "
         "everything the client holds. Mutual-fund categories with an AMFI TER "
         "record are in scope; PPF, NPS, ULIP, deposits, PMS, direct equity and "

@@ -1,4 +1,4 @@
-"""Live Reframe and Shared runs against gpt-5-mini (via OpenRouter).
+"""Live Rethink and Verdict runs against gpt-5-mini (via OpenRouter).
 
 Marked `live`, so excluded from the default suite.
 

@@ -54,13 +54,13 @@ def _feasibility_events(
     events: list[dict[str, Any]] = [
         {
             "type": "log",
-            "source": "Feasibility",
+            "source": "Planner",
             "message": "Verdict:",
             "highlight": verdict.verdict.replace("_", " "),
         },
         {
             "type": "log",
-            "source": "Feasibility",
+            "source": "Planner",
             "message": (
                 f"Projects {_money(verdict.projected_corpus, brief.currency)} "
                 f"against a target of {_money(verdict.target_amount, brief.currency)}"
@@ -77,7 +77,7 @@ def _feasibility_events(
         events.append(
             {
                 "type": "log",
-                "source": "Feasibility",
+                "source": "Planner",
                 "message": (
                     f"Needs {verdict.required_annual_return * 100:.2f}% a year against "
                     f"{verdict.expected_annual_return * 100:.2f}% expected."
@@ -89,7 +89,7 @@ def _feasibility_events(
         events.append(
             {
                 "type": "log",
-                "source": "Feasibility",
+                "source": "Planner",
                 "message": "Shift:",
                 "highlight": move,
             }
@@ -98,10 +98,10 @@ def _feasibility_events(
     events.append(
         {
             "type": "message",
-            "source": "Feasibility",
+            "source": "Planner",
             "text": verdict.headline,
             "report": {
-                "agent": "Feasibility",
+                "agent": "Planner",
                 "title": "Goal feasibility",
                 "headline": verdict.headline,
                 "verdict": verdict.verdict,
@@ -135,7 +135,7 @@ def _statute_events(verdict: StatuteVerdict, currency: str = "INR") -> list[dict
     events: list[dict[str, Any]] = [
         {
             "type": "log",
-            "source": "Statute",
+            "source": "Tax",
             "message": "Tax payable:",
             "highlight": _money(verdict.total_tax, currency),
         },
@@ -144,7 +144,7 @@ def _statute_events(verdict: StatuteVerdict, currency: str = "INR") -> list[dict
         events.append(
             {
                 "type": "log",
-                "source": "Statute",
+                "source": "Tax",
                 "message": "Sections:",
                 "highlight": ", ".join(verdict.sections_applied),
             }
@@ -153,7 +153,7 @@ def _statute_events(verdict: StatuteVerdict, currency: str = "INR") -> list[dict
         events.append(
             {
                 "type": "log",
-                "source": "Statute",
+                "source": "Tax",
                 "message": "FY staging saves:",
                 "highlight": _money(verdict.staging_saves, currency),
             }
@@ -182,10 +182,10 @@ def _statute_events(verdict: StatuteVerdict, currency: str = "INR") -> list[dict
     events.append(
         {
             "type": "message",
-            "source": "Statute",
+            "source": "Tax",
             "text": verdict.headline,
             "report": {
-                "agent": "Statute",
+                "agent": "Tax",
                 "title": "Switch tax cost",
                 "headline": verdict.headline,
                 "verdict": "stage" if verdict.recommend_staging else "price",
@@ -202,13 +202,13 @@ def _channel_events(verdict: ChannelVerdict, currency: str = "INR") -> list[dict
     events: list[dict[str, Any]] = [
         {
             "type": "log",
-            "source": "Channel",
+            "source": "Fees",
             "message": "Annual Regular drag:",
             "highlight": _money(verdict.annual_drag_rupees, currency),
         },
         {
             "type": "log",
-            "source": "Channel",
+            "source": "Fees",
             "message": (
                 f"{verdict.annual_drag_pct_of_portfolio * 100:.3f}% of the portfolio a year"
             ),
@@ -218,7 +218,7 @@ def _channel_events(verdict: ChannelVerdict, currency: str = "INR") -> list[dict
         events.append(
             {
                 "type": "log",
-                "source": "Channel",
+                "source": "Fees",
                 "message": "Cannot price:",
                 "highlight": item,
             }
@@ -245,10 +245,10 @@ def _channel_events(verdict: ChannelVerdict, currency: str = "INR") -> list[dict
     events.append(
         {
             "type": "message",
-            "source": "Channel",
+            "source": "Fees",
             "text": verdict.headline,
             "report": {
-                "agent": "Channel",
+                "agent": "Fees",
                 "title": "Regular vs Direct drag",
                 "headline": verdict.headline,
                 "verdict": "drag",
@@ -265,7 +265,7 @@ def _reframe_events(verdict: ReframeVerdict, currency: str = "INR") -> list[dict
     events: list[dict[str, Any]] = [
         {
             "type": "log",
-            "source": "Reframe",
+            "source": "Rethink",
             "message": "Preferred lever:",
             "highlight": verdict.preferred_lever,
         },
@@ -274,7 +274,7 @@ def _reframe_events(verdict: ReframeVerdict, currency: str = "INR") -> list[dict
         events.append(
             {
                 "type": "log",
-                "source": "Reframe",
+                "source": "Rethink",
                 "message": "Slip delay:",
                 "highlight": f"{verdict.slip_delay_months} months",
             }
@@ -283,7 +283,7 @@ def _reframe_events(verdict: ReframeVerdict, currency: str = "INR") -> list[dict
         events.append(
             {
                 "type": "log",
-                "source": "Reframe",
+                "source": "Rethink",
                 "message": "Reachable target:",
                 "highlight": _money(verdict.shrink_reachable_target, currency),
             }
@@ -292,7 +292,7 @@ def _reframe_events(verdict: ReframeVerdict, currency: str = "INR") -> list[dict
         events.append(
             {
                 "type": "log",
-                "source": "Reframe",
+                "source": "Rethink",
                 "message": "Monthly top-up:",
                 "highlight": _money(verdict.topup_additional_monthly, currency) + "/mo",
             }
@@ -326,10 +326,10 @@ def _reframe_events(verdict: ReframeVerdict, currency: str = "INR") -> list[dict
     events.append(
         {
             "type": "message",
-            "source": "Reframe",
+            "source": "Rethink",
             "text": verdict.headline,
             "report": {
-                "agent": "Reframe",
+                "agent": "Rethink",
                 "title": "Reframed levers",
                 "headline": verdict.headline,
                 "verdict": verdict.preferred_lever,
@@ -345,13 +345,13 @@ def _shared_events(verdict: SharedVerdict, currency: str = "INR") -> list[dict[s
     events: list[dict[str, Any]] = [
         {
             "type": "log",
-            "source": "Shared",
+            "source": "Verdict",
             "message": "Best path:",
             "highlight": verdict.best_path,
         },
         {
             "type": "log",
-            "source": "Shared",
+            "source": "Verdict",
             "message": "Eligibility:",
             "highlight": verdict.highest_eligible_lane,
         },
@@ -360,7 +360,7 @@ def _shared_events(verdict: SharedVerdict, currency: str = "INR") -> list[dict[s
         events.append(
             {
                 "type": "log",
-                "source": "Shared",
+                "source": "Verdict",
                 "message": f"[{stance.posture}] {stance.path}:",
                 "highlight": stance.line,
             }
@@ -369,10 +369,10 @@ def _shared_events(verdict: SharedVerdict, currency: str = "INR") -> list[dict[s
     events.append(
         {
             "type": "message",
-            "source": "Shared",
+            "source": "Verdict",
             "text": verdict.headline,
             "report": {
-                "agent": "Shared",
+                "agent": "Verdict",
                 "title": "Desk close",
                 "headline": verdict.headline,
                 "verdict": verdict.best_path,
@@ -446,7 +446,7 @@ def _emit_run_verdict(run: AgentRun, *, goal: GoalBrief | None = None) -> None:
 
 
 def stream_feasibility(brief: GoalBrief, model: str | None = None) -> int:
-    """Run Feasibility alone. Prefer `stream_pipeline` for the full desk."""
+    """Run Planner alone. Prefer `stream_pipeline` for the full desk."""
     emit({"type": "status", "state": "thinking", "label": "Assessing goal feasibility"})
     emit(
         {
@@ -476,12 +476,12 @@ def stream_feasibility(brief: GoalBrief, model: str | None = None) -> int:
 
 
 def stream_pipeline(brief: GoalBrief, model: str | None = None, **pipeline_kwargs: Any) -> int:
-    """Run Feasibility → Statute → Channel → Reframe → Shared."""
+    """Run Planner → Tax → Fees → Rethink → Verdict."""
     emit(
         {
             "type": "status",
             "state": "thinking",
-            "label": "Running Feasibility → Statute → Channel → Reframe → Shared",
+            "label": "Running Planner → Tax → Fees → Rethink → Verdict",
         }
     )
     emit(
@@ -499,11 +499,11 @@ def stream_pipeline(brief: GoalBrief, model: str | None = None, **pipeline_kwarg
 
     try:
         stages = [
-            ("1/5", "Feasibility", "Feasibility assessing goal"),
-            ("2/5", "Statute", "Statute pricing the switch"),
-            ("3/5", "Channel", "Channel measuring TER drag"),
-            ("4/5", "Reframe", "Reframe solving the three levers"),
-            ("5/5", "Shared", "Shared closing the desk"),
+            ("1/5", "Planner", "Planner assessing goal"),
+            ("2/5", "Tax", "Tax pricing the switch"),
+            ("3/5", "Fees", "Fees measuring TER drag"),
+            ("4/5", "Rethink", "Rethink solving the three levers"),
+            ("5/5", "Verdict", "Verdict closing the desk"),
         ]
 
         emit({"type": "status", "state": "thinking", "label": stages[0][2]})
