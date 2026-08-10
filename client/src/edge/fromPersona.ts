@@ -41,9 +41,16 @@ export function allocFromRound1(equityPct: number, depositPct: number): Alloc {
   })
 }
 
-/** Round-1 used salary × 55 as a stand-in for investable corpus. */
+/**
+ * Round-1 uses a fixed multiple of salary as a stand-in for investable corpus.
+ * 5.5x matches the ratio already baked into every seeded persona (e.g. P1:
+ * ₹20.6Cr / ₹3.75Cr salary = 5.5x) — it was previously miswritten as 55,
+ * a decimal-point bug that inflated slider-driven wealth by 10x.
+ */
+const SALARY_TO_WEALTH_MULTIPLE = 5.5
+
 export function wealthFromSalary(salary: number): number {
-  return Math.round(salary * 55)
+  return Math.round(salary * SALARY_TO_WEALTH_MULTIPLE)
 }
 
 export function round1FromAlloc(alloc: Alloc): { equityPct: number; depositPct: number } {

@@ -96,9 +96,9 @@ export function PositionStep() {
                     type="range"
                     aria-label="Salary"
                     className="w-full"
-                    min={5_000_000}
-                    max={60_000_000}
-                    step={500_000}
+                    min={1_000_000}
+                    max={9_000_000}
+                    step={100_000}
                     value={round1.salary}
                     onChange={(e) =>
                       dispatch({ type: 'SET_ROUND1', levers: { salary: Number(e.target.value) } })
@@ -109,6 +109,7 @@ export function PositionStep() {
               <LeverRow
                 label="Equity allocation"
                 value={`${round1.equityAllocationPct}%`}
+                hint="Splits 70/30 into Equity MFs / Direct equity below"
                 control={
                   <input
                     type="range"
@@ -130,6 +131,7 @@ export function PositionStep() {
               <LeverRow
                 label="Deposit allocation"
                 value={`${round1.depositAllocationPct}%`}
+                hint="Splits 60/40 into Fixed deposits / Debt MFs below"
                 control={
                   <input
                     type="range"
@@ -151,7 +153,9 @@ export function PositionStep() {
             </div>
             <p className="mt-2 font-citation text-citation uppercase leading-relaxed text-on-surface-variant">
               Same levers as Round 1. Equity + deposit is hard-capped at 100%. Remainder maps to
-              gold and real estate. Wealth defaults to salary × 55 and can be overridden below.
+              gold and real estate. Wealth defaults to salary × 5.5 and can be overridden below.
+              Equity and deposit each split further into the two sleeves shown in the detail view
+              underneath — the percentages there always sum back to the lever above.
             </p>
           </div>
 
@@ -444,14 +448,23 @@ function LeverRow({
   label,
   value,
   control,
+  hint,
 }: {
   label: string
   value: string
   control: ReactNode
+  hint?: string
 }) {
   return (
     <div className="-mx-2 flex flex-wrap items-center px-2 py-stack-compact">
-      <div className="w-1/3 min-w-[120px] font-body-md text-body-md text-primary">{label}</div>
+      <div className="w-1/3 min-w-[120px]">
+        <div className="font-body-md text-body-md text-primary">{label}</div>
+        {hint ? (
+          <div className="mt-0.5 font-citation text-citation uppercase leading-snug text-on-surface-variant">
+            {hint}
+          </div>
+        ) : null}
+      </div>
       <div className="flex-1 px-stack-dense">{control}</div>
       <div className="w-28 text-right font-data-md text-data-md text-primary">{value}</div>
     </div>
